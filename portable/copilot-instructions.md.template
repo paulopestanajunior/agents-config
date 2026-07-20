@@ -1,0 +1,21 @@
+# GitHub Copilot Instructions
+
+> Copie este arquivo para `.github/copilot-instructions.md` na raiz do
+> projeto (junto com `AGENTS.md` e a pasta `profiles/` na raiz).
+
+Este repositório usa perfis de especialista documentados em `AGENTS.md` e na
+pasta `profiles/`. Antes de responder ou gerar código:
+
+1. Leia `AGENTS.md` para o escopo do repositório e a tabela de roteamento.
+2. Identifique se a tarefa se encaixa em um perfil (`profiles/*.md`) e leia o
+   arquivo completo do perfil relevante antes de agir.
+3. Para revisão de PR ou diff, use sempre `profiles/code-review.md`.
+
+## Regras Gerais
+
+- Restrinja mudanças ao escopo pedido. Prefira patches pequenos e
+  revisáveis.
+- Não invente dado que não vem de fonte/API/tool explícita.
+- Não hardcode secrets, tokens ou credenciais.
+- Sempre informe quais validações (lint, testes) devem ser executadas
+  quando não puder executá-las você mesmo.

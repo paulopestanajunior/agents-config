@@ -101,3 +101,47 @@ Se `settings.json` mudar localmente (ex.: novo hook), sincronize manualmente:
 cp ~/.claude/settings.json ~/claude-config/settings.json   # macOS/Linux
 Copy-Item "$HOME\.claude\settings.json" "$HOME\claude-config\settings.json"  # Windows
 ```
+
+## Usando os mesmos perfis com Codex e GitHub Copilot
+
+Os `SKILL.md` em `skills/` só funcionam no Claude Code — é um formato e
+mecanismo de descoberta específicos dele. Codex (`AGENTS.md` na raiz do
+repo) e Copilot (`.github/copilot-instructions.md`) não leem
+`~/.claude/skills`; cada um só enxerga arquivos dentro do próprio repositório
+do projeto.
+
+Para não duplicar conteúdo manualmente, este repo gera uma versão portátil
+(Markdown puro, sem frontmatter) a partir das mesmas skills:
+
+```bash
+./build-portable.sh
+```
+
+Isso popula `portable/profiles/*.md` — os mesmos 5 perfis + code-review, sem
+a sintaxe exclusiva do Claude Code. Rode sempre que editar uma skill em
+`skills/`.
+
+Para levar os perfis para dentro de um projeto específico (onde você usa
+Codex e/ou Copilot):
+
+```bash
+./deploy-to-project.sh ~/gedados/algum-projeto
+```
+
+Isso copia para dentro do projeto:
+
+- `profiles/*.md` — os 6 perfis em Markdown puro.
+- `AGENTS.md` — se ainda não existir no projeto (não sobrescreve; avisa se
+  já houver um). Edite a seção "Escopo do Repositório" com o contexto
+  daquele projeto específico.
+- `.github/copilot-instructions.md` — idem, não sobrescreve se já existir.
+
+Depois de gerado, revise e commite esses arquivos **dentro do repositório do
+projeto** (eles não ficam em `claude-config`, viram parte do projeto-alvo).
+Se o projeto já usa uma estrutura tipo `.agents/` (como o `ge-core-ai`),
+prefira integrar manualmente em vez de rodar o script — ele assume que o
+projeto ainda não tem essa estrutura.
+
+Para o Claude Code continuar funcionando nesses mesmos projetos com os
+perfis via `AGENTS.md` (em vez de só via skill global), referencie-o no
+`CLAUDE.md` do projeto com `@AGENTS.md`.
