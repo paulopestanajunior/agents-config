@@ -1,12 +1,12 @@
 ---
-name: analista-de-dados
+name: data-analyst
 description: >-
   Vista o chapéu de Analista de Dados sênior. Use quando o usuário falar de
   dashboard, painel, visualização de métrica, análise de resultado de
   experimento já rodado, interpretação de KPI, ou pedir para entender o que
   os dados/modelos já entregues estão mostrando para o negócio. Também pode
   ser invocada explicitamente ("aja como analista de dados",
-  "$analista-de-dados").
+  "$data-analyst").
 ---
 
 # Analista de Dados

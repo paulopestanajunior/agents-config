@@ -1,7 +1,7 @@
 # AGENTS.md
 
 > Copie este arquivo para a raiz do projeto (junto com a pasta `profiles/`)
-> para que Codex, Copilot e outras ferramentas reconheçam os 5 perfis de
+> para que Codex, Copilot e outras ferramentas reconheçam os perfis de
 > especialista. Ajuste a seção "Escopo do repositório" para o projeto atual.
 
 ## Escopo do Repositório
@@ -25,19 +25,25 @@ relevante antes de agir numa tarefa que se encaixe nele.
 |---|---|---|
 | Code Review | `profiles/code-review.md` | Revisar diff/PR, avaliar prontidão para merge. |
 | Engenheiro de Dados | `profiles/data-engineer.md` | Arquitetura de dados, BigQuery, Dataform, pipelines, schema, custo de query. |
-| Engenheiro de IA/ML | `profiles/ia-ml-engineer.md` | Agentes LLM, ADK, Vertex AI, RAG, contratos de tool, custo de tokens. |
+| Engenheiro de IA/ML | `profiles/ai-ml-engineer.md` | Agentes LLM, ADK, Vertex AI, RAG, contratos de tool, custo de tokens. |
 | DevOps | `profiles/devops.md` | CI/CD, Tsuru, deploy, secrets, permissões de acesso. |
-| Cientista de Dados | `profiles/cientista-de-dados.md` | Modelagem estatística/ML, feature engineering, experimentos. |
-| Analista de Dados | `profiles/analista-de-dados.md` | Dashboards, KPIs, leitura de métrica/experimento. |
+| Cientista de Dados | `profiles/data-scientist.md` | Modelagem estatística/ML, feature engineering, experimentos. |
+| Analista de Dados | `profiles/data-analyst.md` | Dashboards, KPIs, leitura de métrica/experimento. |
+| SecOps | `profiles/secops.md` | Hardening, gestão de segredos, vulnerabilidade, resposta a incidente. |
+| Marketing Analytics | `profiles/marketing-analytics.md` | Atribuição, UTM, funil de conversão, GTM, performance de campanha. |
+| QA de Tracking/Integrações | `profiles/qa-tracking-integrations.md` | QA de SDK/postback (Appsflyer, Adjust), deep link, GTM debug. |
 
 ## Roteamento
 
 - Revisão de diff, PR ou prontidão para merge → `profiles/code-review.md`.
 - Pergunta ou tarefa de arquitetura/pipeline de dado → `profiles/data-engineer.md`.
-- Pergunta ou tarefa sobre agente/modelo LLM → `profiles/ia-ml-engineer.md`.
+- Pergunta ou tarefa sobre agente/modelo LLM → `profiles/ai-ml-engineer.md`.
 - Pergunta ou tarefa de deploy/CI/CD/acesso → `profiles/devops.md`.
-- Pergunta ou tarefa de modelagem estatística/experimento → `profiles/cientista-de-dados.md`.
-- Pergunta ou tarefa de dashboard/métrica de negócio → `profiles/analista-de-dados.md`.
+- Pergunta ou tarefa de modelagem estatística/experimento → `profiles/data-scientist.md`.
+- Pergunta ou tarefa de dashboard/métrica de negócio → `profiles/data-analyst.md`.
+- Pergunta ou tarefa de segurança/hardening/incidente → `profiles/secops.md`.
+- Pergunta ou tarefa de atribuição/campanha/GTM → `profiles/marketing-analytics.md`.
+- Pergunta ou tarefa de QA de evento/SDK/postback de tracking → `profiles/qa-tracking-integrations.md`.
 
 Se a tarefa não se encaixa claramente em nenhum perfil, prossiga com
 julgamento padrão — os perfis são para aprofundar, não para bloquear.

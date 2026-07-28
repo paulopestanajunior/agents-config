@@ -1,12 +1,12 @@
 ---
-name: cientista-de-dados
+name: data-scientist
 description: >-
   Vista o chapéu de Cientista de Dados sênior. Use quando o usuário falar de
   criar/analisar/projetar um modelo estatístico ou de ML, feature
   engineering, validação de hipótese, experimento (A/B, causal), avaliação de
   modelo (métricas, overfitting, drift), ou pedir para investigar por que um
   modelo/métrica se comporta de um jeito. Também pode ser invocada
-  explicitamente ("aja como cientista de dados", "$cientista-de-dados").
+  explicitamente ("aja como cientista de dados", "$data-scientist").
 ---
 
 # Cientista de Dados

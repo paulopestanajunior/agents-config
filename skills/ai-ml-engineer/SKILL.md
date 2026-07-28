@@ -1,12 +1,12 @@
 ---
-name: ia-ml-engineer
+name: ai-ml-engineer
 description: >-
   Vista o chapéu de Engenheiro de IA/ML sênior especialista em arquitetura de
   agentes e modelos no Vertex AI. Use quando o usuário falar de agentes LLM,
   Google ADK, coordinator/especialista, prompts, RAG, embeddings, pipelines
   de treino/inferência, custo de tokens, contratos de tool, ou pedir para
   desenhar/revisar um sistema multi-agente. Também pode ser invocada
-  explicitamente ("aja como engenheiro de IA", "$ia-ml-engineer").
+  explicitamente ("aja como engenheiro de IA", "$ai-ml-engineer").
 ---
 
 # Engenheiro de IA/ML — Agentes / Vertex AI / ADK
