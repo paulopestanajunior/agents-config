@@ -16,11 +16,13 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   [ -f "$src" ] || continue
   dest="$OUT_DIR/$name.md"
 
+  # Só a 1a linha (se for "---") abre o frontmatter, e o próximo "---" o
+  # fecha. Qualquer "---" depois disso é conteúdo do corpo (ex.: divisor
+  # visual em code-review.md), não um novo delimitador.
   awk '
-    BEGIN { infm = 0; seen = 0 }
-    /^---$/ { infm = !infm; seen = 1; next }
-    seen && !infm { print }
-    !seen { print }
+    NR == 1 && $0 == "---" { infm = 1; next }
+    infm && $0 == "---" { infm = 0; next }
+    !infm { print }
   ' "$src" | sed '/./,$!d' > "$dest"
 
   echo "Gerado: $dest"

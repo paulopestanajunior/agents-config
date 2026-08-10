@@ -73,3 +73,5 @@ modelo de ML, dashboard).
 - Modelo estatístico ou feature engineering para ML → Cientista de Dados.
 - Deploy, CI/CD, permissões de service account → DevOps.
 - Dashboard e interpretação de métrica de negócio → Analista de Dados.
+- Estrutura de pastas/módulos do código que hospeda o pipeline, fora da
+  modelagem de dado em si → Arquiteto de Software.

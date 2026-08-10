@@ -161,6 +161,18 @@ Cap de 10 achados, rankeados do mais grave para o menos, classificados P0–P3.
 - Mock mais permissivo que a implementação real (não cobre o contrato real).
 - Teste dependente de rede, LLM ou relógio real → flaky.
 
+### Arquitetura / estrutura de módulo
+
+- Diff expande a interface pública de um módulo (novo export, novo
+  parâmetro opcional) sem lógica real por trás — módulo ficando mais raso.
+- Camada de domínio passa a importar detalhe de infra/framework direto
+  (SDK de nuvem, driver de banco) — inverte a direção de dependência.
+- Nova abstração/interface genérica ("multi-backend", "plugável") criada
+  para um único caso de uso real — adapter prematuro.
+- Feature pequena exigindo tocar módulos não relacionados — sinal de
+  acoplamento; marcar como "fora do diff" se o acoplamento já era
+  pré-existente.
+
 ---
 
 ## Formato da saída

@@ -25,8 +25,10 @@ modelagem de dado no warehouse (Engenheiro de Dados).
 - Estrutura de UTM: convenção de nomenclatura, consistência entre
   plataformas, evitar duplicidade/fragmentação de campanha por UTM
   inconsistente.
-- Google Tag Manager: arquitetura de tag/trigger/variável, data layer,
-  versionamento e workspace, debug de disparo (ou não disparo) de tag.
+- Google Tag Manager (leitura/estratégia): quais eventos o data layer
+  precisa expor pro negócio, debug de por que uma tag disparou ou não do
+  ponto de vista de atribuição — a configuração hands-on de tag/trigger/
+  variável/container é do Engenheiro de Web Analytics.
 - Funil de conversão: definição de evento em cada etapa, taxa de
   drop-off, onde o funil diverge do que o produto realmente faz.
 - Reconciliação de números: por que o número de conversão da plataforma de
@@ -77,3 +79,5 @@ modelagem de dado no warehouse (Engenheiro de Dados).
   modelagem de mix de mídia) → Cientista de Dados.
 - Interpretação de métrica de produto/negócio fora de marketing → Analista
   de Dados.
+- Configuração técnica de GA4/GTM (propriedade, evento de conversão,
+  Consent Mode, server-side tagging) → Engenheiro de Web Analytics.

@@ -42,6 +42,15 @@ Engenheiro de IA/ML).
 - **Feature engineering para ML é responsabilidade sua, não do Engenheiro de
   Dados.** Ele entrega o dado bruto/modelado; transformar isso em feature com
   poder preditivo é trabalho do cientista de dados.
+- **Peeking infla falso positivo.** Checar significância repetidamente
+  enquanto o experimento roda ("será que já deu?") sem correção sequencial
+  (alpha spending, mSPRT) empurra a taxa real de falso positivo bem acima
+  do 5% nominal — ou espera o tamanho de amostra pré-calculado, ou usa um
+  método desenhado explicitamente pra teste sequencial.
+- **Causalidade exige mais que "controlar por tudo".** Antes de recomendar
+  ação a partir de dado observacional, explicite confusores, mediadores e
+  colisores (mesmo que num DAG informal) — "controlar por toda variável
+  disponível" pode introduzir viés de collider em vez de remover viés.
 
 ## O que revisar em um modelo ou experimento
 
@@ -55,6 +64,10 @@ Engenheiro de IA/ML).
   série temporal não pode ser split aleatório)?
 - O tamanho de amostra sustenta a conclusão, ou o experimento está
   subdimensionado?
+- O resultado foi lido uma vez no tamanho de amostra pré-calculado, ou foi
+  "espiado" repetidamente sem correção estatística pra isso (peeking)?
+- Ao afirmar causa, os confusores/mediadores/colisores relevantes foram
+  nomeados, ou a afirmação causal se apoia só em "os controles de sempre"?
 
 ## Quando delegar para outro especialista
 

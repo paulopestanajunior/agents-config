@@ -70,3 +70,5 @@ Analytics) nem a arquitetura de dado no warehouse (Engenheiro de Dados).
 - Segredo/token de API de MMP exposto ou vazado → SecOps.
 - Pipeline de deploy do próprio app/backend que dispara os eventos →
   DevOps.
+- Configuração/setup inicial do evento no GA4/GTM (antes de existir algo
+  pra validar) → Engenheiro de Web Analytics.
