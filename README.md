@@ -105,43 +105,56 @@ Copy-Item "$HOME\.claude\settings.json" "$HOME\claude-config\settings.json"  # W
 ## Usando os mesmos perfis com Codex e GitHub Copilot
 
 Os `SKILL.md` em `skills/` só funcionam no Claude Code — é um formato e
-mecanismo de descoberta específicos dele. Codex (`AGENTS.md` na raiz do
-repo) e Copilot (`.github/copilot-instructions.md`) não leem
-`~/.claude/skills`; cada um só enxerga arquivos dentro do próprio repositório
-do projeto.
-
-Para não duplicar conteúdo manualmente, este repo gera uma versão portátil
-(Markdown puro, sem frontmatter) a partir das mesmas skills:
+mecanismo de descoberta específicos dele. Para não duplicar conteúdo
+manualmente, este repo gera uma versão portátil (Markdown puro, sem
+frontmatter) a partir das mesmas skills:
 
 ```bash
 ./build-portable.sh
 ```
 
-Isso popula `portable/profiles/*.md` — os mesmos 5 perfis + code-review, sem
-a sintaxe exclusiva do Claude Code. Rode sempre que editar uma skill em
+Isso popula `portable/profiles/*.md`. Rode sempre que editar uma skill em
 `skills/`.
 
-Para levar os perfis para dentro de um projeto específico (onde você usa
-Codex e/ou Copilot):
+### Global (padrão — nenhum passo por projeto)
+
+`install.sh`/`install.ps1` já criam link global também para Codex CLI e
+GitHub Copilot (VS Code), no mesmo espírito do `~/.claude/skills`:
+
+| Ferramenta | Link criado | O que isso dá |
+|---|---|---|
+| Codex CLI | `~/.codex/AGENTS.md` → `portable/AGENTS.global.md`<br>`~/.codex/profiles` → `portable/profiles/` | Codex concatena automaticamente esse `AGENTS.md` global com o de qualquer projeto que você abrir — [comportamento documentado](https://developers.openai.com/codex/guides/agents-md). |
+| GitHub Copilot (VS Code) | `~/.copilot/instructions` → `portable/copilot-instructions/`<br>`~/.copilot/profiles` → `portable/profiles/` | VS Code lê instruções de usuário dessa pasta em qualquer workspace — [comportamento documentado](https://code.visualstudio.com/docs/agent-customization/custom-instructions). Recurso mais novo; se sua versão do VS Code ainda não ler `~/.copilot/instructions`, caia no fluxo por-projeto abaixo. |
+
+Ou seja: rode o installer uma vez por máquina e as três ferramentas (Claude
+Code, Codex, Copilot) já enxergam os 12 perfis em qualquer projeto, sem
+`deploy-to-project.sh`.
+
+**Windows:** criar o link de pasta (`Junction`) não exige privilégio
+especial, mas o link de **arquivo** (`SymbolicLink` — usado em `CLAUDE.md` e
+`AGENTS.md`) exige Developer Mode ativo ou PowerShell como Administrador.
+Se o `install.ps1` avisar erro de privilégio nessas duas linhas
+especificamente, ative o Developer Mode (*Configurações > Privacidade e
+Segurança > Para Desenvolvedores*) e rode de novo — ele é idempotente, só
+recria o que ainda não está correto.
+
+### Por projeto (fallback, ou pra customizar escopo específico)
+
+Use `deploy-to-project.sh` quando quiser um `AGENTS.md`/
+`.github/copilot-instructions.md` **dentro do projeto**, com uma seção de
+escopo específica daquele repositório (stack, o que é legado, etc.) — o
+global não tem espaço pra isso, é só roteamento:
 
 ```bash
 ./deploy-to-project.sh ~/gedados/algum-projeto
 ```
 
-Isso copia para dentro do projeto:
-
-- `profiles/*.md` — os 6 perfis em Markdown puro.
-- `AGENTS.md` — se ainda não existir no projeto (não sobrescreve; avisa se
-  já houver um). Edite a seção "Escopo do Repositório" com o contexto
-  daquele projeto específico.
-- `.github/copilot-instructions.md` — idem, não sobrescreve se já existir.
-
-Depois de gerado, revise e commite esses arquivos **dentro do repositório do
-projeto** (eles não ficam em `claude-config`, viram parte do projeto-alvo).
-Se o projeto já usa uma estrutura tipo `.agents/` (como o `ge-core-ai`),
-prefira integrar manualmente em vez de rodar o script — ele assume que o
-projeto ainda não tem essa estrutura.
+Isso copia `profiles/*.md`, e cria `AGENTS.md`/`.github/copilot-instructions.md`
+só se ainda não existirem (nunca sobrescreve). Depois de gerado, revise e
+commite esses arquivos **dentro do repositório do projeto**. Se o projeto já
+usa uma estrutura tipo `.agents/` (como o `ge-core-ai`), prefira integrar
+manualmente em vez de rodar o script.
 
 Para o Claude Code continuar funcionando nesses mesmos projetos com os
-perfis via `AGENTS.md` (em vez de só via skill global), referencie-o no
-`CLAUDE.md` do projeto com `@AGENTS.md`.
+perfis locais via `AGENTS.md` (em vez de só via skill global), referencie-o
+no `CLAUDE.md` do projeto com `@AGENTS.md`.

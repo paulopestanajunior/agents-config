@@ -5,23 +5,44 @@ $ClaudeDir = Join-Path $HOME ".claude"
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null
 
-$SkillsTarget = Join-Path $ClaudeDir "skills"
-if ((Test-Path $SkillsTarget) -and -not (Get-Item $SkillsTarget).LinkType) {
-    Write-Host "Aviso: $SkillsTarget já existe e não é um link. Renomeando para skills.bak"
-    Rename-Item $SkillsTarget "skills.bak"
-}
-if (Test-Path $SkillsTarget) { Remove-Item $SkillsTarget -Force }
-New-Item -ItemType Junction -Path $SkillsTarget -Target (Join-Path $RepoDir "skills") | Out-Null
-Write-Host "Link criado: $SkillsTarget -> $RepoDir\skills"
+# Cria (ou substitui) um link, cuidando pra não perder um arquivo/pasta real
+# que já existisse no lugar (renomeia pra .bak em vez de apagar).
+# Usa .NET Directory/File.Delete em vez de Remove-Item pra remover um link
+# antigo: Remove-Item numa junction/reparse point dispara um prompt interno
+# do PowerShell 5.1 que quebra em sessão não-interativa, mesmo com -Force.
+function Set-Link {
+    param(
+        [Parameter(Mandatory)] [string]$LinkPath,
+        [Parameter(Mandatory)] [string]$Target,
+        [Parameter(Mandatory)] [ValidateSet("SymbolicLink", "Junction")] [string]$Type
+    )
 
-$ClaudeMdTarget = Join-Path $ClaudeDir "CLAUDE.md"
-if ((Test-Path $ClaudeMdTarget) -and -not (Get-Item $ClaudeMdTarget).LinkType) {
-    Write-Host "Aviso: $ClaudeMdTarget já existe e não é um link. Renomeando para CLAUDE.md.bak"
-    Rename-Item $ClaudeMdTarget "CLAUDE.md.bak"
+    if (Test-Path $LinkPath) {
+        $item = Get-Item $LinkPath -Force
+        if (-not $item.LinkType) {
+            $bakName = (Split-Path -Leaf $LinkPath) + ".bak"
+            Write-Host "Aviso: $LinkPath já existe e não é um link. Renomeando para $bakName"
+            Rename-Item $LinkPath $bakName
+        } elseif ($item.Target -eq $Target) {
+            Write-Host "Já correto: $LinkPath -> $Target"
+            return
+        } else {
+            if ($item.PSIsContainer) {
+                [System.IO.Directory]::Delete($LinkPath, $false)
+            } else {
+                [System.IO.File]::Delete($LinkPath)
+            }
+        }
+    }
+
+    if (-not (Test-Path $LinkPath)) {
+        New-Item -ItemType $Type -Path $LinkPath -Target $Target | Out-Null
+        Write-Host "Link criado: $LinkPath -> $Target"
+    }
 }
-if (Test-Path $ClaudeMdTarget) { Remove-Item $ClaudeMdTarget -Force }
-New-Item -ItemType SymbolicLink -Path $ClaudeMdTarget -Target (Join-Path $RepoDir "CLAUDE.md") | Out-Null
-Write-Host "Link criado: $ClaudeMdTarget -> $RepoDir\CLAUDE.md"
+
+Set-Link -LinkPath (Join-Path $ClaudeDir "skills") -Target (Join-Path $RepoDir "skills") -Type Junction
+Set-Link -LinkPath (Join-Path $ClaudeDir "CLAUDE.md") -Target (Join-Path $RepoDir "CLAUDE.md") -Type SymbolicLink
 
 $SettingsTarget = Join-Path $ClaudeDir "settings.json"
 if (Test-Path $SettingsTarget) {
@@ -31,6 +52,22 @@ if (Test-Path $SettingsTarget) {
     Copy-Item (Join-Path $RepoDir "settings.json") $SettingsTarget
     Write-Host "settings.json copiado para $SettingsTarget"
 }
+
+# Codex CLI: ~/.codex/AGENTS.md é global e concatenado automaticamente com
+# o AGENTS.md de cada projeto -- não precisa de deploy-to-project.ps1.
+$CodexDir = Join-Path $HOME ".codex"
+New-Item -ItemType Directory -Force -Path $CodexDir | Out-Null
+Set-Link -LinkPath (Join-Path $CodexDir "AGENTS.md") -Target (Join-Path $RepoDir "portable\AGENTS.global.md") -Type SymbolicLink
+Set-Link -LinkPath (Join-Path $CodexDir "profiles") -Target (Join-Path $RepoDir "portable\profiles") -Type Junction
+
+# GitHub Copilot (VS Code): ~/.copilot/instructions é lido em toda sessão,
+# em qualquer workspace, sem precisar de .github/copilot-instructions.md
+# por projeto. Recurso mais novo -- confira no VS Code se sua versão já lê
+# instruções de usuário desta pasta.
+$CopilotDir = Join-Path $HOME ".copilot"
+New-Item -ItemType Directory -Force -Path $CopilotDir | Out-Null
+Set-Link -LinkPath (Join-Path $CopilotDir "instructions") -Target (Join-Path $RepoDir "portable\copilot-instructions") -Type Junction
+Set-Link -LinkPath (Join-Path $CopilotDir "profiles") -Target (Join-Path $RepoDir "portable\profiles") -Type Junction
 
 Write-Host ""
 Write-Host "Falta reinstalar o RTK (não versionado neste repo):"
