@@ -268,13 +268,7 @@ write_catalog() {
   } > "$out"
 }
 
-write_component_index() {
-  out="$1"
-  title="$2"
-  mkdir -p "$(dirname "$out")"
-  {
-    printf '# %s\n\n' "$title"
-    printf '%s\n\n' "$GENERATED_AT"
+write_component_sections() {
     printf '## Skills\n\n'
     list_skills
     printf '\n## Roles\n\n'
@@ -285,7 +279,19 @@ write_component_index() {
     list_markdown_files profiles
     printf '\n## Rules\n\n'
     list_markdown_files rules
-  } > "$out"
+}
+
+write_component_index() {
+  out="$1"
+  title="$2"
+  tmp="$out.tmp"
+  mkdir -p "$(dirname "$out")"
+  {
+    printf '# %s\n\n' "$title"
+    printf '%s\n\n' "$GENERATED_AT"
+    write_component_sections
+  } > "$tmp"
+  mv "$tmp" "$out"
 }
 
 write_agent_bundle() {
@@ -299,11 +305,9 @@ write_agent_bundle() {
     printf '## Canonical Global Harness\n\n'
     awk 'NR > 1 { print }' "$REPO_DIR/AGENTS.md"
     printf '\n## Component Index\n\n'
+    write_component_sections
   } > "$tmp"
-  write_component_index "$out" "$title Component Index"
-  cat "$tmp" "$out" > "$out.next"
-  mv "$out.next" "$out"
-  rm "$tmp"
+  mv "$tmp" "$out"
 }
 
 write_component_index "$REPO_DIR/adapters/claude/COMPONENTS.md" "Claude Component Index"

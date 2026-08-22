@@ -14,6 +14,9 @@ function Get-Title {
     param([Parameter(Mandatory)] [string]$Path)
     $line = Get-Content $Path | Where-Object { $_ -match '^# ' } | Select-Object -First 1
     if ($line) { return ($line -replace '^# ', '') }
+    if ([System.IO.Path]::GetFileName($Path) -eq "SKILL.md") {
+        return (Split-Path -Leaf (Split-Path -Parent $Path))
+    }
     return [System.IO.Path]::GetFileNameWithoutExtension($Path)
 }
 
@@ -108,7 +111,7 @@ function Get-AvoidText {
         "Role" { "Use skill/workflow/profile quando precisar apenas de expertise, sequência ou profundidade." }
         "Workflow" { "Evite quando a tarefa não seguir esta sequência de execução." }
         "Profile" { "Evite quando a profundidade, autonomia ou postura de risco pedida for diferente." }
-        "Rule" { "Não ignore silenciosamente; documente exceções específicas do projeto em `.agents/overrides/`." }
+        "Rule" { 'Não ignore silenciosamente; documente exceções específicas do projeto em `.agents/overrides/`.' }
     }
 }
 
@@ -248,9 +251,9 @@ function Write-Catalog {
         "",
         "Gerado a partir dos diretórios canônicos do agents-config. Não edite manualmente.",
         "",
-        "Fonte da verdade: `skills/*/SKILL.md`, `roles/*.md`, `workflows/*.md`, `profiles/*.md` e `rules/*.md`.",
+        'Fonte da verdade: `skills/*/SKILL.md`, `roles/*.md`, `workflows/*.md`, `profiles/*.md` e `rules/*.md`.',
         "",
-        "Observação: nomes e caminhos vêm dos arquivos canônicos usados pelos agents. Os textos em português vêm de `docs/catalog.pt.tsv` quando existirem; novos componentes sem anotação aparecem com fallback em português.",
+        'Observação: nomes e caminhos vêm dos arquivos canônicos usados pelos agents. Os textos em português vêm de `docs/catalog.pt.tsv` quando existirem; novos componentes sem anotação aparecem com fallback em português.',
         "",
         "| Tipo | Nome | Finalidade | Quando Usar | Quando Evitar | Caminho |",
         "|---|---|---|---|---|---|"
@@ -271,7 +274,7 @@ function Write-Catalog {
                 if ($ptWhen) {
                     $description = $ptWhen
                 } else {
-                    $description = "Use quando a tarefa exigir a especialidade `$($_.Name)`. Consulte o arquivo canônico para critérios detalhados."
+                    $description = 'Use quando a tarefa exigir a especialidade `{0}`. Consulte o arquivo canônico para critérios detalhados.' -f $_.Name
                 }
                 $lines += New-CatalogRow -Type "Skill" -Name $_.Name -Purpose $title -When $description -Path (Get-RelativePath -Path $skillFile) -Avoid $ptAvoid
             }
@@ -299,7 +302,7 @@ function Write-Catalog {
             if ($ptWhen) {
                 $summary = $ptWhen
             } else {
-                $summary = "Use quando precisar do componente `$name`. Consulte o arquivo canônico para critérios detalhados."
+                $summary = 'Use quando precisar do componente `{0}`. Consulte o arquivo canônico para critérios detalhados.' -f $name
             }
             $lines += New-CatalogRow -Type $type -Name $name -Purpose $title -When $summary -Path (Get-RelativePath -Path $_.FullName) -Avoid $ptAvoid
         }
@@ -308,17 +311,8 @@ function Write-Catalog {
     Set-Content -Path $output -Value $lines -Encoding UTF8
 }
 
-function Write-ComponentIndex {
-    param(
-        [Parameter(Mandatory)] [string]$Output,
-        [Parameter(Mandatory)] [string]$Title
-    )
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Output) | Out-Null
+function Get-ComponentSectionLines {
     $lines = @(
-        "# $Title",
-        "",
-        $GeneratedAt,
-        "",
         "## Skills",
         ""
     )
@@ -331,7 +325,25 @@ function Write-ComponentIndex {
     $lines += Get-MarkdownLines -Directory "profiles"
     $lines += @("", "## Rules", "")
     $lines += Get-MarkdownLines -Directory "rules"
-    Set-Content -Path $Output -Value $lines -Encoding UTF8
+    return $lines
+}
+
+function Write-ComponentIndex {
+    param(
+        [Parameter(Mandatory)] [string]$Output,
+        [Parameter(Mandatory)] [string]$Title
+    )
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Output) | Out-Null
+    $tmp = "$Output.tmp"
+    $lines = @(
+        "# $Title",
+        "",
+        $GeneratedAt,
+        ""
+    )
+    $lines += Get-ComponentSectionLines
+    Set-Content -Path $tmp -Value $lines -Encoding UTF8
+    Move-Item -Force -Path $tmp -Destination $Output
 }
 
 function Write-AgentBundle {
@@ -339,9 +351,9 @@ function Write-AgentBundle {
         [Parameter(Mandatory)] [string]$Output,
         [Parameter(Mandatory)] [string]$Title
     )
-    $tmp = "$Output.tmp"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Output) | Out-Null
     $rootAgents = Get-Content (Join-Path $RepoDir "AGENTS.md") | Select-Object -Skip 1
+    $tmp = "$Output.tmp"
     $lines = @(
         "# $Title",
         "",
@@ -352,13 +364,9 @@ function Write-AgentBundle {
     )
     $lines += $rootAgents
     $lines += @("", "## Component Index", "")
+    $lines += Get-ComponentSectionLines
     Set-Content -Path $tmp -Value $lines -Encoding UTF8
-    Write-ComponentIndex -Output $Output -Title "$Title Component Index"
-    $combined = @()
-    $combined += Get-Content $tmp
-    $combined += Get-Content $Output
-    Set-Content -Path $Output -Value $combined -Encoding UTF8
-    Remove-Item $tmp
+    Move-Item -Force -Path $tmp -Destination $Output
 }
 
 function Remove-Frontmatter {

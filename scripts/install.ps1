@@ -5,12 +5,22 @@ $KimiCodeHome = if ($env:KIMI_CODE_HOME) { $env:KIMI_CODE_HOME } else { Join-Pat
 
 & (Join-Path $RepoDir "scripts/generate-adapters.ps1")
 
+function Get-PathItem {
+    param([Parameter(Mandatory)] [string]$Path)
+    return Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+}
+
+function Test-PathOrLink {
+    param([Parameter(Mandatory)] [string]$Path)
+    return $null -ne (Get-PathItem -Path $Path)
+}
+
 function Backup-Path {
     param([Parameter(Mandatory)] [string]$Path)
     $base = "$Path.bak"
     $candidate = $base
     $n = 1
-    while (Test-Path $candidate) {
+    while (Test-PathOrLink -Path $candidate) {
         $candidate = "$base.$n"
         $n += 1
     }
@@ -25,8 +35,8 @@ function Set-Link {
         [Parameter(Mandatory)] [ValidateSet("SymbolicLink", "Junction")] [string]$Type
     )
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $LinkPath) | Out-Null
-    if (Test-Path $LinkPath) {
-        $item = Get-Item $LinkPath -Force
+    $item = Get-PathItem -Path $LinkPath
+    if ($item) {
         if ($item.LinkType -and $item.Target -eq $Target) {
             Write-Host "Already linked: $LinkPath -> $Target"
             return
@@ -47,8 +57,8 @@ function Set-Link {
 }
 
 $AgentsConfig = Join-Path $HOME ".agents-config"
-if (Test-Path $AgentsConfig) {
-    $item = Get-Item $AgentsConfig -Force
+$item = Get-PathItem -Path $AgentsConfig
+if ($item) {
     if ($item.LinkType -and $item.Target -eq $RepoDir) {
         Write-Host "Already linked: $AgentsConfig -> $RepoDir"
     } else {

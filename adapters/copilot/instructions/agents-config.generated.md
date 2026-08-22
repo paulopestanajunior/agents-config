@@ -44,10 +44,6 @@ and exceptions belong in the project's own `AGENTS.md`, `PROJECT.md`,
 
 ## Component Index
 
-# Copilot Global Instructions Component Index
-
-Generated from the canonical agents-config directories. Do not edit by hand.
-
 ## Skills
 
 - `agent-evaluation` - Agent Evaluation (`skills/agent-evaluation/SKILL.md`)

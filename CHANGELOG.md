@@ -17,6 +17,10 @@
   status in the file header.
 - Replace Claude's generated component index with
   `adapters/claude/COMPONENTS.md`, referenced by the Claude adapter wrapper.
+- Harden shell and PowerShell generator parity to avoid markdown escape
+  corruption, duplicate bundle headings, partial bundle writes, and recurring
+  generated-file churn.
+- Harden PowerShell install path handling for existing or dangling links.
 
 ### Added
 
@@ -76,12 +80,13 @@
   deploy, and portable build scripts.
 - Validate Claude settings JSON.
 - Validate generated catalog/adapters from canonical discovery.
+- Validate generated bundles contain a single generated banner and no nested
+  component-index H1.
 - Validate automatic discovery with temporary skill plus temporary workflow,
   then remove fixtures and regenerate.
 - Validate `init-project.sh` dry-run, execution, and idempotency, including
   spec directories.
 - Confirm no hardcoded references to temporary discovery fixtures remain.
-- Confirm no commit or push was performed.
 
 ## Versioning Policy
 
