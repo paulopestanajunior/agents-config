@@ -36,6 +36,8 @@
   preserving Codex system skills.
 - Move replaced Codex skill directories to `~/.codex/skills-backups` so backup
   copies do not remain discoverable as active skills.
+- Prune stale Codex skill links managed by the harness when skills are renamed
+  or removed.
 - Add `init-project` support for shell and PowerShell with explicit target,
   dry-run, idempotency, overwrite protection, and project-local context only.
 - Add project bootstrap structure for `docs/decisions/`,

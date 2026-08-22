@@ -79,7 +79,8 @@ O instalador:
 - cria link para o `AGENTS.md` global do Codex;
 - cria links individuais das skills globais em `~/.codex/skills`, preservando
   `.system`; skills antigas substituídas são movidas para
-  `~/.codex/skills-backups`;
+  `~/.codex/skills-backups`, e links antigos gerenciados pelo harness são
+  podados quando a skill deixa de existir;
 - cria links para instruções/perfis gerados do Copilot;
 - cria links para instruções e skills globais do Kimi Code;
 - cria links para instruções e skills globais do ZCode;

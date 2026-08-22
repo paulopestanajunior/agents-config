@@ -8,7 +8,13 @@ KIMI_CODE_HOME="${KIMI_CODE_HOME:-$HOME/.kimi-code}"
 
 backup_path() {
   path="$1"
-  base="$path.bak"
+  backup_dir="${2:-}"
+  if [ -n "$backup_dir" ]; then
+    mkdir -p "$backup_dir"
+    base="$backup_dir/$(basename "$path").bak"
+  else
+    base="$path.bak"
+  fi
   candidate="$base"
   n=1
   while [ -e "$candidate" ] || [ -L "$candidate" ]; do
@@ -22,6 +28,8 @@ backup_path() {
 safe_link() {
   target="$1"
   link="$2"
+  backup_dir="${3:-}"
+  backup_message="${4:-Existing path moved to backup:}"
   mkdir -p "$(dirname "$link")"
   if [ -L "$link" ]; then
     current="$(readlink "$link")"
@@ -31,46 +39,34 @@ safe_link() {
     fi
     rm "$link"
   elif [ -e "$link" ]; then
-    bak="$(backup_path "$link")"
-    echo "Existing path moved to backup: $bak"
+    bak="$(backup_path "$link" "$backup_dir")"
+    echo "$backup_message $bak"
   fi
   ln -s "$target" "$link"
   echo "Linked: $link -> $target"
-}
-
-backup_codex_skill_path() {
-  path="$1"
-  backup_dir="$HOME/.codex/skills-backups"
-  mkdir -p "$backup_dir"
-  name="$(basename "$path")"
-  base="$backup_dir/$name.bak"
-  candidate="$base"
-  n=1
-  while [ -e "$candidate" ] || [ -L "$candidate" ]; do
-    candidate="$base.$n"
-    n=$((n + 1))
-  done
-  mv "$path" "$candidate"
-  echo "$candidate"
 }
 
 safe_codex_skill_link() {
   target="$1"
   link="$2"
-  mkdir -p "$(dirname "$link")"
-  if [ -L "$link" ]; then
-    current="$(readlink "$link")"
-    if [ "$current" = "$target" ]; then
-      echo "Already linked: $link -> $target"
-      return
-    fi
-    rm "$link"
-  elif [ -e "$link" ]; then
-    bak="$(backup_codex_skill_path "$link")"
-    echo "Existing Codex skill moved to backup: $bak"
-  fi
-  ln -s "$target" "$link"
-  echo "Linked: $link -> $target"
+  safe_link "$target" "$link" "$HOME/.codex/skills-backups" "Existing Codex skill moved to backup:"
+}
+
+prune_codex_skill_links() {
+  skills_dir="$HOME/.codex/skills"
+  [ -d "$skills_dir" ] || return
+  for link in "$skills_dir"/*; do
+    [ -L "$link" ] || continue
+    target="$(readlink "$link")"
+    case "$target" in
+      "$REPO_DIR"/skills/*)
+        if [ ! -e "$link" ]; then
+          rm "$link"
+          echo "Removed stale Codex skill link: $link"
+        fi
+        ;;
+    esac
+  done
 }
 
 if [ -e "$HOME/.agents-config" ] || [ -L "$HOME/.agents-config" ]; then
@@ -105,6 +101,7 @@ fi
 
 safe_link "$REPO_DIR/adapters/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 mkdir -p "$HOME/.codex/skills"
+prune_codex_skill_links
 for skill_file in "$REPO_DIR"/skills/*/SKILL.md; do
   [ -f "$skill_file" ] || continue
   skill_name="$(basename "$(dirname "$skill_file")")"

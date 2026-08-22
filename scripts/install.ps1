@@ -16,8 +16,16 @@ function Test-PathOrLink {
 }
 
 function Backup-Path {
-    param([Parameter(Mandatory)] [string]$Path)
-    $base = "$Path.bak"
+    param(
+        [Parameter(Mandatory)] [string]$Path,
+        [string]$BackupDir = ""
+    )
+    if ($BackupDir) {
+        New-Item -ItemType Directory -Force -Path $BackupDir | Out-Null
+        $base = Join-Path $BackupDir "$(Split-Path -Leaf $Path).bak"
+    } else {
+        $base = "$Path.bak"
+    }
     $candidate = $base
     $n = 1
     while (Test-PathOrLink -Path $candidate) {
@@ -32,7 +40,9 @@ function Set-Link {
     param(
         [Parameter(Mandatory)] [string]$Target,
         [Parameter(Mandatory)] [string]$LinkPath,
-        [Parameter(Mandatory)] [ValidateSet("SymbolicLink", "Junction")] [string]$Type
+        [Parameter(Mandatory)] [ValidateSet("SymbolicLink", "Junction")] [string]$Type,
+        [string]$BackupDir = "",
+        [string]$BackupMessage = "Existing path moved to backup:"
     )
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $LinkPath) | Out-Null
     $item = Get-PathItem -Path $LinkPath
@@ -48,28 +58,12 @@ function Set-Link {
                 [System.IO.File]::Delete($LinkPath)
             }
         } else {
-            $bak = Backup-Path -Path $LinkPath
-            Write-Host "Existing path moved to backup: $bak"
+            $bak = Backup-Path -Path $LinkPath -BackupDir $BackupDir
+            Write-Host "$BackupMessage $bak"
         }
     }
     New-Item -ItemType $Type -Path $LinkPath -Target $Target | Out-Null
     Write-Host "Linked: $LinkPath -> $Target"
-}
-
-function Backup-CodexSkillPath {
-    param([Parameter(Mandatory)] [string]$Path)
-    $backupDir = Join-Path $HOME ".codex/skills-backups"
-    New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
-    $name = Split-Path -Leaf $Path
-    $base = Join-Path $backupDir "$name.bak"
-    $candidate = $base
-    $n = 1
-    while (Test-PathOrLink -Path $candidate) {
-        $candidate = "$base.$n"
-        $n += 1
-    }
-    Rename-Item $Path $candidate
-    return $candidate
 }
 
 function Set-CodexSkillLink {
@@ -77,26 +71,28 @@ function Set-CodexSkillLink {
         [Parameter(Mandatory)] [string]$Target,
         [Parameter(Mandatory)] [string]$LinkPath
     )
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $LinkPath) | Out-Null
-    $item = Get-PathItem -Path $LinkPath
-    if ($item) {
-        if ($item.LinkType -and $item.Target -eq $Target) {
-            Write-Host "Already linked: $LinkPath -> $Target"
-            return
-        }
-        if ($item.LinkType) {
-            if ($item.PSIsContainer) {
-                [System.IO.Directory]::Delete($LinkPath, $false)
-            } else {
-                [System.IO.File]::Delete($LinkPath)
+    Set-Link `
+        -Target $Target `
+        -LinkPath $LinkPath `
+        -Type Junction `
+        -BackupDir (Join-Path $HOME ".codex/skills-backups") `
+        -BackupMessage "Existing Codex skill moved to backup:"
+}
+
+function Remove-StaleCodexSkillLinks {
+    param([Parameter(Mandatory)] [string]$SkillsDir)
+    if (-not (Test-Path $SkillsDir -PathType Container)) { return }
+    $managedPrefix = (Join-Path $RepoDir "skills") + [System.IO.Path]::DirectorySeparatorChar
+    Get-ChildItem $SkillsDir -Force | ForEach-Object {
+        if (-not $_.LinkType) { return }
+        $target = [string]($_.Target | Select-Object -First 1)
+        if ($target.StartsWith($managedPrefix)) {
+            if (-not (Test-Path -LiteralPath $target)) {
+                Remove-Item -LiteralPath $_.FullName -Force
+                Write-Host "Removed stale Codex skill link: $($_.FullName)"
             }
-        } else {
-            $bak = Backup-CodexSkillPath -Path $LinkPath
-            Write-Host "Existing Codex skill moved to backup: $bak"
         }
     }
-    New-Item -ItemType Junction -Path $LinkPath -Target $Target | Out-Null
-    Write-Host "Linked: $LinkPath -> $Target"
 }
 
 $AgentsConfig = Join-Path $HOME ".agents-config"
@@ -131,6 +127,7 @@ if (Test-Path $ClaudeSettings) {
 Set-Link -Target (Join-Path $RepoDir "adapters/codex/AGENTS.md") -LinkPath (Join-Path $HOME ".codex/AGENTS.md") -Type SymbolicLink
 $CodexSkills = Join-Path $HOME ".codex/skills"
 New-Item -ItemType Directory -Force -Path $CodexSkills | Out-Null
+Remove-StaleCodexSkillLinks -SkillsDir $CodexSkills
 Get-ChildItem (Join-Path $RepoDir "skills") -Directory | Sort-Object Name | ForEach-Object {
     $skillFile = Join-Path $_.FullName "SKILL.md"
     if (Test-Path $skillFile) {
