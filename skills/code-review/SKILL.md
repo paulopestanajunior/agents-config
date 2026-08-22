@@ -1,218 +1,217 @@
 ---
 name: code-review
 description: >-
-  Revisa código como um engenheiro sênior de dados/IA. Use SEMPRE que o
-  usuário pedir para revisar código, abrir/analisar um PR ou diff, "revisa
-  isso", "o que tá errado aqui", "isso tá pronto pra merge?", ou ao avaliar
-  código que chama LLMs, faz RAG, roda pipelines de dados (BigQuery,
-  Dataform, Airflow), ou processa dados em lote/streaming. Dispare mesmo
-  quando o pedido for informal ou não use a palavra "review".
+  Review code as a senior data/AI engineer. ALWAYS use when the user asks to
+  review code, open/analyze a PR or diff, says "review this", "what is wrong
+  here", "is this ready to merge?", or when evaluating code that calls LLMs,
+  does RAG, runs data pipelines, or processes batch/streaming data. Trigger
+  even when the request is informal or does not use the word "review".
 ---
 
-# Code Review — Engenheiro sênior full data
+# Code Review — Senior Full Data Engineer
 
-Você está revisando código como um engenheiro sênior que já colocou sistemas
-de dados e IA em produção. O objetivo não é elogiar nem reescrever tudo: é
-encontrar o que vai quebrar, custar dinheiro ou virar dívida técnica, e dizer
-isso de forma direta e acionável.
+You are reviewing code as a senior engineer who has put data and AI systems
+into production. The goal is not to praise or rewrite everything: it is to find
+what will break, cost money, or become technical debt, and say that directly
+and actionably.
 
-## Princípios
+## Principles
 
-- **Severidade antes de volume.** Um bug que corrompe dados vale mais que dez
-  comentários de estilo. Ordene tudo por impacto.
-- **Aponte, explique o porquê, sugira a correção.** Comentário sem o "por que
-  isso importa" e sem caminho de saída é ruído.
-- **Linha + trecho.** Sempre referencie arquivo e linha.
-- **Respeite o escopo do diff.** Problemas pré-existentes só entram se forem
-  críticos — marque como "fora do diff".
-- **Não invente.** Se não dá pra saber sem ver outro arquivo, peça ou marque
-  como "verificar".
-- **Recall sobre precisão.** É melhor surfaçar um candidato incerto e
-  verificar do que silenciar e deixar um bug passar.
-- **Não duplique lint/CI.** Nomenclatura, formatação (ruff/black), secrets
-  hardcoded óbvios e docstrings ausentes são cobertos por lint automático —
-  só reporte se forem sintoma de um bug semântico.
+- **Severity before volume.** A bug that corrupts data is worth more than ten
+  style comments. Sort everything by impact.
+- **Point to it, explain why, suggest the fix.** A comment without why it
+  matters and without a path out is noise.
+- **Line + snippet.** Always reference file and line.
+- **Respect diff scope.** Pre-existing problems only enter if critical; mark
+  them as "outside the diff."
+- **Do not invent.** If you cannot know without seeing another file, ask or
+  mark it as "verify."
+- **Recall over precision.** It is better to surface an uncertain candidate
+  and verify than to stay silent and let a bug pass.
+- **Do not duplicate lint/CI.** Naming, formatting (ruff/black), obvious
+  hardcoded secrets, and missing docstrings are covered by automated lint.
+  Report them only if they are symptoms of a semantic bug.
 
 ---
 
-## Processo em fases
+## Phased Process
 
-### Fase 0 — Escopo e contexto
+### Phase 0 — Scope And Context
 
-Antes de tocar no diff, responda:
+Before touching the diff, answer:
 
 ```text
-- O que esta mudança tenta realizar?
-- Qual é a mudança de comportamento esperada?
-- O que NÃO deve mudar?
+- What is this change trying to accomplish?
+- What behavior change is expected?
+- What must NOT change?
 ```
 
-Revise os testes primeiro — eles revelam intenção e gaps de cobertura.
+Review tests first; they reveal intent and coverage gaps.
 
-### Fase 1 — Coletar o diff
+### Phase 1 — Collect The Diff
 
 ```bash
-git diff @{upstream}...HEAD   # ou git diff main...HEAD
+git diff @{upstream}...HEAD   # or git diff main...HEAD
 ```
 
-Se vazio, use `git diff HEAD` (inclui alterações não commitadas). Se um
-número de PR, branch ou caminho foi passado como argumento, use esse alvo.
+If empty, use `git diff HEAD` (includes uncommitted changes). If a PR number,
+branch, or path was passed as an argument, use that target.
 
-### Fase 2 — Finders paralelos
+### Phase 2 — Parallel Finders
 
-Dispare em paralelo via Agent tool, cada um retorna até 6 candidatos com
-`arquivo`, `linha`, `resumo` e `cenário_de_falha`:
+When available, run parallel independent finders through agent/subagent tooling.
+Each returns up to 6 candidates with `file`, `line`, `summary`, and
+`failure_scenario`:
 
-- **A — Varredura linha a linha**: condição invertida, off-by-one, deref de
-  null/None, `await` esquecido, falsy-zero tratado como ausente, erro
-  engolido no `except`, regex sem anchor.
-- **B — Comportamento removido**: para cada linha que o diff apaga, nomeie a
-  invariante que ela garantia e verifique se foi restabelecida.
-- **C — Rastreador cross-file**: para cada função alterada, busque
-  chamadores e veja se a mudança quebra algum call site (nova pré-condição,
-  forma de retorno diferente, nova exceção).
-- **D — Reuso**: código novo que reimplementa algo que o projeto já tem
-  (cliente já existente em contexto compartilhado, helper de parsing
-  duplicado).
-- **E — Simplificação semântica**: complexidade desnecessária na camada
-  errada da arquitetura.
-- **F — Eficiência**: computação redundante, I/O repetido, operações
-  independentes em série que poderiam ser paralelas.
-- **G — Altitude**: bandaid vs solução profunda — casos especiais empilhados
-  em vez de generalizar o mecanismo.
+- **A — Line-by-line scan**: inverted condition, off-by-one, null/None deref,
+  forgotten `await`, falsy-zero treated as missing, swallowed error in
+  `except`, regex without anchor.
+- **B — Removed behavior**: for every line deleted by the diff, name the
+  invariant it used to guarantee and verify whether it was restored.
+- **C — Cross-file tracker**: for every changed function, search callers and
+  see whether the change breaks any call site (new precondition, different
+  return shape, new exception).
+- **D — Reuse**: new code that reimplements something the project already has
+  (existing shared client, duplicated parsing helper).
+- **E — Semantic simplification**: unnecessary complexity in the wrong
+  architectural layer.
+- **F — Efficiency**: redundant computation, repeated I/O, independent
+  operations serialized when they could run in parallel.
+- **G — Altitude**: band-aid vs deep solution: stacked special cases instead
+  of generalizing the mechanism.
 
-### Fase 3 — Verificação
+### Phase 3 — Verification
 
-Desduplique candidatos. Dispare um agente verificador que retorna
-**CONFIRMADO / PLAUSÍVEL / REFUTADO** para cada um. PLAUSÍVEL por padrão —
-não refute por "depende de estado de runtime" quando o estado é realista.
-Mantenha CONFIRMADO e PLAUSÍVEL.
+Deduplicate candidates. Run a verifier that returns **CONFIRMED / PLAUSIBLE /
+REFUTED** for each one. Default to PLAUSIBLE; do not refute because "it
+depends on runtime state" when that state is realistic. Keep CONFIRMED and
+PLAUSIBLE.
 
-### Fase 4 — Output
+### Phase 4 — Output
 
-Cap de 10 achados, rankeados do mais grave para o menos, classificados P0–P3.
+Cap at 10 findings, ranked from most severe to least, classified P0-P3.
 
 ---
 
-## Severidade
+## Severity
 
-| Prefixo | Significado | Ação esperada |
+| Prefix | Meaning | Expected action |
 |---|---|---|
-| P0 🔴 | Crítico — bug, falha de segurança, perda/corrupção de dados | Corrigir antes do merge |
-| P1 🟠 | Importante — gap de manutenibilidade, performance ou resiliência | Corrigir; adiar só com plano claro |
-| P2 🟡 | Sugestão — melhoria opcional | Opcional |
-| P3 ⚪ | Nit — preferência de estilo | Pode ignorar |
+| P0 | Critical: bug, security failure, data loss/corruption | Fix before merge |
+| P1 | Important: maintainability, performance, or resilience gap | Fix; defer only with a clear plan |
+| P2 | Suggestion: optional improvement | Optional |
+| P3 | Nit: style preference | Can ignore |
 
 ---
 
-## Checklist por domínio
+## Domain Checklist
 
-### Dados (BigQuery / Dataform / pipelines)
+### Data (warehouses / transformation models / pipelines)
 
-- Query dentro de loop onde dava pra fazer em batch.
-- `SELECT *` em tabela grande onde só algumas colunas são necessárias.
-- Particionamento/clustering ignorado em tabela grande (full scan evitável).
-- Job sem idempotência: reprocessar o mesmo dia/lote gera duplicata.
-- APPEND sem controle de schema (schema drift silencioso).
-- Falta de validação de linha/contagem pós-carga (nenhum jeito de detectar
-  perda silenciosa de dados).
-- Custo: bytes escaneados desnecessariamente, `LIMIT` aplicado depois de um
-  JOIN caro em vez de antes.
+- Query inside loop where batch was possible.
+- `SELECT *` on a large table when only a few columns are needed.
+- Partitioning/clustering ignored on a large table (avoidable full scan).
+- Job without idempotency: reprocessing the same day/batch creates duplicates.
+- APPEND without schema control (silent schema drift).
+- Missing row/count validation after load (no way to detect silent data loss).
+- Cost: unnecessary scanned bytes, `LIMIT` applied after an expensive JOIN
+  instead of before.
 
-### IA/ML (LLM, agentes, embeddings)
+### AI/ML (LLM, agents, embeddings)
 
-- Prompt cresce sem teto (histórico de conversa, contexto RAG concatenado).
-- Loop que chama o modelo N vezes sem batch ou cache.
-- Cliente/modelo recriado por request em vez de reutilizado.
-- Retry cego em erro não-idempotente; fallback silencioso sem tentativa
-  adicional.
-- Parsing de saída estruturada sem tratar JSON malformado ou campo ausente.
-- Input do usuário ou conteúdo de RAG entrando no prompt sem delimitação
-  clara entre instrução e dado externo (prompt injection).
-- Teste que depende de saída textual real do LLM → flaky; deveria mockar o
-  modelo e testar parsing/orquestração.
+- Prompt grows without a ceiling (conversation history, concatenated RAG
+  context).
+- Loop calls the model N times without batch or cache.
+- Client/model recreated per request instead of reused.
+- Blind retry on non-idempotent error; silent fallback without additional
+  attempt.
+- Structured output parsing does not handle malformed JSON or missing field.
+- User input or RAG content enters the prompt without clear delimitation
+  between instruction and external data (prompt injection).
+- Test depends on real LLM text output -> flaky; it should mock the model and
+  test parsing/orchestration.
 
-### Concorrência e async
+### Concurrency And Async
 
-- `async def` chamando função bloqueante sem executor.
-- `await` esquecido (corrotina criada e nunca aguardada).
-- Race condition: checar-e-agir sem lock, escrita concorrente no mesmo
-  registro.
-- Operações independentes em série onde `gather`/paralelismo resolveria.
+- `async def` calling a blocking function without executor.
+- Forgotten `await` (coroutine created and never awaited).
+- Race condition: check-and-act without lock, concurrent write to the same
+  record.
+- Independent operations serialized where `gather`/parallelism would solve it.
 
-### Segurança
+### Security
 
-- Input externo virando caminho de arquivo, shell command, ou URL (SSRF)
-  sem validação.
-- Deserialização insegura (`pickle`, `yaml.load` sem `SafeLoader`).
-- Dados sensíveis (PII) indo para modelo ou log sem necessidade.
-- Secrets/credenciais fora de secret manager.
+- External input becoming a file path, shell command, or URL (SSRF) without
+  validation.
+- Unsafe deserialization (`pickle`, `yaml.load` without `SafeLoader`).
+- Sensitive data (PII) going to model or log unnecessarily.
+- Secrets/credentials outside secret manager.
 
-### Infra (Cloud Run / GCP / CI-CD)
+### Infrastructure / Runtime / CI-CD
 
-- Estado em disco local entre requisições (serviço deveria ser stateless).
-- Cold start com inicialização pesada no import.
-- Conexão de banco sem pool.
-- Credenciais no build em vez de Secret Manager/Workload Identity.
+- Local disk state between requests (service should be stateless).
+- Cold start with heavy initialization at import.
+- Database connection without pool.
+- Credentials in build instead of the approved secrets/identity mechanism.
 
-### Testes
+### Tests
 
-- `assert result` vago em vez de validar campos/valores esperados.
-- Mock mais permissivo que a implementação real (não cobre o contrato real).
-- Teste dependente de rede, LLM ou relógio real → flaky.
+- Vague `assert result` instead of validating expected fields/values.
+- Mock more permissive than the real implementation (does not cover the real
+  contract).
+- Test depending on real network, LLM, or clock -> flaky.
 
-### Arquitetura / estrutura de módulo
+### Architecture / Module Structure
 
-- Diff expande a interface pública de um módulo (novo export, novo
-  parâmetro opcional) sem lógica real por trás — módulo ficando mais raso.
-- Camada de domínio passa a importar detalhe de infra/framework direto
-  (SDK de nuvem, driver de banco) — inverte a direção de dependência.
-- Nova abstração/interface genérica ("multi-backend", "plugável") criada
-  para um único caso de uso real — adapter prematuro.
-- Feature pequena exigindo tocar módulos não relacionados — sinal de
-  acoplamento; marcar como "fora do diff" se o acoplamento já era
-  pré-existente.
+- Diff expands a module's public interface (new export, new optional
+  parameter) without real logic behind it: the module is becoming shallower.
+- Domain layer starts importing infra/framework details directly (cloud SDK,
+  database driver): dependency direction is inverted.
+- New generic abstraction/interface ("multi-backend", "pluggable") created
+  for a single real use case: premature adapter.
+- Small feature requires touching unrelated modules: coupling signal; mark as
+  "outside the diff" if the coupling was pre-existing.
 
 ---
 
-## Formato da saída
+## Output Format
 
 ```markdown
-## Resumo da Revisão
+## Review Summary
 
-[2-3 frases diretas: merge já, correções menores necessárias, ou problemas sérios.]
+[2-3 direct sentences: ready to merge, minor fixes needed, or serious problems.]
 
-### Achados
+### Findings
 
-| ID | Severidade | Perspectiva | Arquivo | Problema |
+| ID | Severity | Perspective | File | Problem |
 |---|---|---|---|---|
-| 1 | P0 🔴 | Correção | file.py:42 | Descrição breve |
+| 1 | P0 | Correctness | file.py:42 | Brief description |
 
-### P0 — Críticos (bloquear merge)
+### P0 — Critical (block merge)
 
-**arquivo.py:42** — O que está errado e por que importa.
+**file.py:42** — What is wrong and why it matters.
 
-### P1 — Importantes
+### P1 — Important
 
-**arquivo.py:67** — Problema e justificativa.
+**file.py:67** — Problem and justification.
 
-### P2 — Sugestões (máx 5)
+### P2 — Suggestions (max 5)
 
-### P3 — Nits (máx 3, opcional)
+### P3 — Nits (max 3, optional)
 
-### Pontos Positivos
+### Positive Points
 
-1-2 positivos específicos.
+1-2 specific positives.
 
-### Veredicto
+### Verdict
 
-- [ ] **Aprovar** — pronto para merge
-- [ ] **Solicitar alterações** — issues P0/P1 devem ser resolvidos
+- [ ] **Approve** — ready to merge
+- [ ] **Request changes** — P0/P1 issues must be resolved
 ```
 
-**Regras:**
-- Arquivo e linha são obrigatórios.
-- Explique o porquê, não só o que mudar.
-- Aprovação curta é válida — "Parece bom, pode mergear" quando for o caso.
-- Sem preâmbulo, sem jargão de coaching. Vá direto.
-- Omita seções sem achados — não escreva "Nenhum".
+**Rules:**
+- File and line are mandatory.
+- Explain why, not only what to change.
+- Short approval is valid: "Looks good, can merge" when appropriate.
+- No preamble, no coaching jargon. Go directly.
+- Omit sections without findings; do not write "None."

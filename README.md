@@ -1,160 +1,260 @@
-# claude-config
+# agents-config
 
-Backup pessoal da configuração global do Claude Code: skills de especialista
-(code review, engenheiro de dados, IA/ML, DevOps, cientista de dados,
-analista de dados) e settings globais.
+Harness global e vendor-neutral para coding agents.
 
-Repo: https://github.com/paulopestanajunior/claude-config (privado)
+O harness define como os agentes trabalham entre repositórios: investigação,
+planejamento, implementação, debugging, review, validação, segurança de Git,
+skills reutilizáveis, roles, workflows, profiles, rules, templates e adapters
+de vendor.
 
-## Setup em um computador novo
+Cada projeto define apenas o seu próprio contexto: arquitetura, stack,
+comandos, regras de domínio, serviços externos, decisões, planos e overrides.
 
-Escolha a seção do seu sistema operacional.
-
-### macOS
-
-```bash
-gh repo clone paulopestanajunior/claude-config ~/claude-config
-cd ~/claude-config
-chmod +x install.sh
-./install.sh
-brew install rtk
-rtk init -g
+```text
+GLOBAL HARNESS -> PROJECT CONTEXT -> CURRENT TASK
 ```
 
-Sem `gh` instalado, use `git clone https://github.com/paulopestanajunior/claude-config ~/claude-config`.
+## Conceitos
 
-### Linux (ou WSL no Windows)
+- `skills/<name>/SKILL.md`: especialidade técnica.
+- `roles/<name>.md`: postura operacional.
+- `workflows/<name>.md`: sequência de execução.
+- `profiles/<name>.md`: profundidade e autonomia.
+- `rules/<name>.md`: restrição durável.
+- `adapters/`: compatibilidade fina por vendor.
+- `templates/`: arquivos iniciais para contexto local de projeto.
 
-Igual ao macOS:
+Os componentes são descobertos pela estrutura de diretórios. Adicionar
+`skills/example-skill/SKILL.md`, `roles/example.md` ou
+`workflows/example.md` não deve exigir editar scripts de instalação, build ou
+listas de adapters.
 
-```bash
-gh repo clone paulopestanajunior/claude-config ~/claude-config
-cd ~/claude-config
-chmod +x install.sh
-./install.sh
+## Como Escolher Role, Skill, Workflow E Profile
+
+Use o harness compondo poucos elementos:
+
+```text
+role: architect
+skill: solution-architect
+workflow: architecture-change
+profile: deep
 ```
 
-Para o RTK, veja [releases](https://github.com/rtk-ai/rtk/releases) (binário
-`rtk-x86_64-unknown-linux-gnu`) ou `cargo install --git https://github.com/rtk-ai/rtk`.
+Isso não é um comando nem uma configuração permanente do projeto. É uma forma
+curta de orientar o agent no prompt da tarefa atual. Quando o pedido for óbvio,
+o agent pode inferir a composição; quando você quiser mais controle, escreva a
+composição explicitamente no pedido.
 
-Se o Claude Code no Windows roda dentro do WSL (caso mais comum), use este
-caminho — `~/.claude` ali é o do WSL, não o do Windows nativo.
+Guias rápidos:
 
-### Windows nativo (PowerShell, sem WSL)
+- [docs/quick-start.md](docs/quick-start.md): modelo mental e fluxo de
+  decisão.
+- [docs/catalog.md](docs/catalog.md): catálogo humano com link para o
+  inventário gerado.
+- [docs/examples.md](docs/examples.md): combinações práticas por cenário.
+
+## Instalação
+
+Clone o repositório uma vez:
+
+```bash
+git clone https://github.com/paulopestanajunior/agents-config.git ~/.agents-config
+cd ~/.agents-config
+scripts/install.sh
+```
+
+No Windows PowerShell:
 
 ```powershell
-gh repo clone paulopestanajunior/claude-config "$HOME\claude-config"
-cd "$HOME\claude-config"
-.\install.ps1
+git clone https://github.com/paulopestanajunior/agents-config.git "$HOME\.agents-config"
+cd "$HOME\.agents-config"
+.\scripts\install.ps1
 ```
 
-O `install.ps1` cria os links equivalentes ao `install.sh` (usa `Junction`
-para a pasta `skills` e `SymbolicLink` para `CLAUDE.md`, que não exigem modo
-Administrador da mesma forma que outros links no Windows costumam exigir).
-Se der erro de permissão, rode o PowerShell **como Administrador** ou ative
-o Developer Mode em *Configurações > Privacidade e Segurança > Para
-Desenvolvedores*.
+O instalador:
 
-Para o RTK: baixe `rtk-x86_64-pc-windows-msvc.zip` em
-[releases](https://github.com/rtk-ai/rtk/releases), extraia `rtk.exe` e
-adicione ao PATH (ex.: `C:\Users\<você>\.local\bin`). Depois rode
-`rtk init -g`.
+- gera adapters a partir dos componentes canônicos;
+- cria link para o harness em `~/.agents-config` quando possível;
+- cria links de compatibilidade para Claude Code;
+- cria link para o `AGENTS.md` global do Codex;
+- cria links para instruções/perfis gerados do Copilot;
+- cria links para instruções e skills globais do Kimi Code;
+- cria links para instruções e skills globais do ZCode;
+- nunca sobrescreve `~/.claude/settings.json` silenciosamente.
 
-## O que cada script faz
+Se um caminho existente não for link, o instalador move para `.bak` antes de
+criar o link. Se `~/.claude/settings.json` já existir, ele fica intacto;
+compare manualmente com `adapters/claude/settings.json` se precisar do hook
+do RTK.
 
-- `install.sh` / `install.ps1`: cria link de `skills/` e `CLAUDE.md` para
-  dentro de `~/.claude/`, e copia `settings.json` se ainda não existir lá
-  (nunca sobrescreve um `settings.json` já existente — evita perder
-  configuração específica daquela máquina).
-- Qualquer arquivo original que já existisse em `~/.claude` é renomeado com
-  sufixo `.bak` antes do link ser criado, nunca apagado.
-
-## Reinstalar o RTK (redutor de tokens)
-
-Não versionado neste repo de propósito — é gerado pela própria ferramenta,
-não é configuração pessoal.
-
-| SO | Comando |
-|---|---|
-| macOS | `brew install rtk` |
-| Linux/WSL | binário em [releases](https://github.com/rtk-ai/rtk/releases) ou `cargo install --git https://github.com/rtk-ai/rtk` |
-| Windows nativo | zip em [releases](https://github.com/rtk-ai/rtk/releases), extrair `rtk.exe` para o PATH |
-
-Depois, em qualquer SO: `rtk init -g` e reinicie o Claude Code. Confirme que
-`~/.claude/settings.json` ficou com o hook `PreToolUse` do rtk (comparar com
-`settings.json` deste repo).
-
-## Atualizando o backup
-
-Depois de criar ou editar uma skill em `~/.claude/skills/` (que é um link
-para este repo), as mudanças já aparecem aqui direto. Só falta:
+## Atualização
 
 ```bash
-git add -A
-git commit -m "docs: atualiza skills"
-git push
+cd ~/.agents-config
+git pull
+scripts/generate-adapters.sh
+scripts/install.sh
 ```
 
-Se `settings.json` mudar localmente (ex.: novo hook), sincronize manualmente:
+PowerShell:
+
+```powershell
+cd "$HOME\.agents-config"
+.\scripts\generate-adapters.ps1
+.\scripts\install.ps1
+```
+
+Projetos já inicializados não precisam de novo bootstrap quando uma nova
+skill, role, workflow, profile ou rule global for adicionada. Atualize o
+harness global, regenere adapters, e o novo componente fica disponível pelos
+links globais.
+
+## Bootstrap De Projeto
+
+Inicialize um projeto com apenas contexto local:
 
 ```bash
-cp ~/.claude/settings.json ~/claude-config/settings.json   # macOS/Linux
-Copy-Item "$HOME\.claude\settings.json" "$HOME\claude-config\settings.json"  # Windows
+scripts/init-project.sh --target /path/to/project
+scripts/init-project.sh --target /path/to/project --dry-run
 ```
 
-## Usando os mesmos perfis com Codex e GitHub Copilot
+O bootstrap cria somente contexto local do projeto: `AGENTS.md`, `PROJECT.md`,
+`ARCHITECTURE.md`, `docs/decisions/`, `docs/plans/`, `docs/specs/` e
+`.agents/overrides/`. Ele não copia skills, roles, workflows, profiles ou
+rules globais para dentro do projeto.
 
-Os `SKILL.md` em `skills/` só funcionam no Claude Code — é um formato e
-mecanismo de descoberta específicos dele. Para não duplicar conteúdo
-manualmente, este repo gera uma versão portátil (Markdown puro, sem
-frontmatter) a partir das mesmas skills:
+PowerShell:
+
+```powershell
+.\scripts\init-project.ps1 -Target C:\path\to\project
+.\scripts\init-project.ps1 -Target C:\path\to\project -DryRun
+```
+
+O bootstrap cria somente arquivos e diretórios locais ausentes:
+
+```text
+AGENTS.md
+PROJECT.md
+ARCHITECTURE.md
+docs/decisions/
+docs/plans/active/
+docs/plans/completed/
+docs/specs/active/
+docs/specs/completed/
+.agents/overrides/
+```
+
+Ele é idempotente e não copia skills, rules, roles, workflows ou profiles
+globais para dentro do projeto.
+
+Use `templates/SPEC.md` como ponto de partida para specs locais em
+`docs/specs/active/` quando a tarefa tiver regra de negócio ambígua, impacto
+cross-module, mudança arquitetural ou decisão difícil de reverter.
+
+Use `templates/TRACKING_PLAN.md` para tracking plans locais quando precisar
+definir eventos, propriedades, identidade, consentimento, destinos,
+deduplicação e critérios de validação antes da implementação.
+
+## Claude Code
+
+Instale o Claude Code separadamente seguindo a documentação oficial da
+Anthropic. Um caminho comum de instalação via CLI tem sido:
 
 ```bash
-./build-portable.sh
+npm install -g @anthropic-ai/claude-code
+claude doctor
 ```
 
-Isso popula `portable/profiles/*.md`. Rode sempre que editar uma skill em
-`skills/`.
+Autentique com sua conta Claude quando solicitado.
 
-### Global (padrão — nenhum passo por projeto)
+Integração com o harness:
 
-`install.sh`/`install.ps1` já criam link global também para Codex CLI e
-GitHub Copilot (VS Code), no mesmo espírito do `~/.claude/skills`:
+- `~/.claude/CLAUDE.md` aponta para o `CLAUDE.md` da raiz;
+- o `CLAUDE.md` da raiz referencia `AGENTS.md` e
+  `adapters/claude/CLAUDE.md`;
+- `~/.claude/skills` aponta para `skills/`;
+- `adapters/claude/settings.json` preserva o template do hook RTK.
 
-| Ferramenta | Link criado | O que isso dá |
-|---|---|---|
-| Codex CLI | `~/.codex/AGENTS.md` → `portable/AGENTS.global.md`<br>`~/.codex/profiles` → `portable/profiles/` | Codex concatena automaticamente esse `AGENTS.md` global com o de qualquer projeto que você abrir — [comportamento documentado](https://developers.openai.com/codex/guides/agents-md). |
-| GitHub Copilot (VS Code) | `~/.copilot/instructions` → `portable/copilot-instructions/`<br>`~/.copilot/profiles` → `portable/profiles/` | VS Code lê instruções de usuário dessa pasta em qualquer workspace — [comportamento documentado](https://code.visualstudio.com/docs/agent-customization/custom-instructions). Recurso mais novo; se sua versão do VS Code ainda não ler `~/.copilot/instructions`, caia no fluxo por-projeto abaixo. |
+O `~/.claude/settings.json` existente não é sobrescrito. A configuração local
+pode conter campos específicos da máquina, como tema, modelo ou TUI, além de
+`rtk hook claude`.
 
-Ou seja: rode o installer uma vez por máquina e as três ferramentas (Claude
-Code, Codex, Copilot) já enxergam os 12 perfis em qualquer projeto, sem
-`deploy-to-project.sh`.
+## Codex
 
-**Windows:** criar o link de pasta (`Junction`) não exige privilégio
-especial, mas o link de **arquivo** (`SymbolicLink` — usado em `CLAUDE.md` e
-`AGENTS.md`) exige Developer Mode ativo ou PowerShell como Administrador.
-Se o `install.ps1` avisar erro de privilégio nessas duas linhas
-especificamente, ative o Developer Mode (*Configurações > Privacidade e
-Segurança > Para Desenvolvedores*) e rode de novo — ele é idempotente, só
-recria o que ainda não está correto.
+Instale o Codex separadamente pela extensão oficial do VS Code ou CLI
+disponível para sua conta. Faça login com a conta ChatGPT com acesso ao Codex
+e abra um workspace antes de esperar comportamento consciente do repositório.
 
-### Por projeto (fallback, ou pra customizar escopo específico)
+Integração com o harness:
 
-Use `deploy-to-project.sh` quando quiser um `AGENTS.md`/
-`.github/copilot-instructions.md` **dentro do projeto**, com uma seção de
-escopo específica daquele repositório (stack, o que é legado, etc.) — o
-global não tem espaço pra isso, é só roteamento:
+- `scripts/generate-adapters.sh` gera `adapters/codex/AGENTS.md`;
+- `scripts/install.sh` cria link para `~/.codex/AGENTS.md`;
+- `AGENTS.md` locais de projeto adicionam contexto e overrides do projeto.
 
-```bash
-./deploy-to-project.sh ~/gedados/algum-projeto
-```
+## GitHub Copilot
 
-Isso copia `profiles/*.md`, e cria `AGENTS.md`/`.github/copilot-instructions.md`
-só se ainda não existirem (nunca sobrescreve). Depois de gerado, revise e
-commite esses arquivos **dentro do repositório do projeto**. Se o projeto já
-usa uma estrutura tipo `.agents/` (como o `ge-core-ai`), prefira integrar
-manualmente em vez de rodar o script.
+Instale o GitHub Copilot no VS Code e faça login com a conta GitHub correta.
 
-Para o Claude Code continuar funcionando nesses mesmos projetos com os
-perfis locais via `AGENTS.md` (em vez de só via skill global), referencie-o
-no `CLAUDE.md` do projeto com `@AGENTS.md`.
+Integração com o harness:
+
+- instruções de usuário geradas ficam em `adapters/copilot/instructions/`;
+- perfis Markdown de skills ficam em `adapters/copilot/profiles/`;
+- instaladores criam links para `~/.copilot/` quando a versão local do
+  Copilot/VS Code suporta esse fluxo.
+
+## ZCode / GLM, Kimi, Kilo / OpenRouter
+
+Instale e autentique cada agente pelo fluxo oficial de distribuição,
+assinatura ou API key.
+
+Adapters com conteúdo real existem para Kimi Code e ZCode porque ambos têm
+pontos globais documentados para instruções e skills.
+
+Integração com o Kimi Code:
+
+- `scripts/generate-adapters.sh` gera `adapters/kimi/AGENTS.md`;
+- `scripts/install.sh` cria link para `$KIMI_CODE_HOME/AGENTS.md`, ou
+  `~/.kimi-code/AGENTS.md` quando `KIMI_CODE_HOME` não estiver definido;
+- `scripts/install.sh` cria link de `skills/` para `$KIMI_CODE_HOME/skills`.
+
+Integração com o ZCode:
+
+- `scripts/generate-adapters.sh` gera `adapters/zcode/AGENTS.md`;
+- `scripts/install.sh` cria link para `~/.zcode/AGENTS.md`;
+- `scripts/install.sh` cria link de `skills/` para `~/.zcode/skills`.
+
+Kilo / OpenRouter continuam sem adapter próprio até haver um ponto de
+integração global útil e validável. Esses agentes devem consumir o
+`AGENTS.md` comum do projeto e os recursos globais expostos pelo ambiente do
+usuário.
+
+## Versionamento
+
+O harness usa SemVer em `VERSION`.
+
+- `MAJOR`: quebra de layout, contrato de scripts, paths de adapters ou
+  comportamento de bootstrap de projeto.
+- `MINOR`: nova skill, role, workflow, profile, rule, template, adapter ou
+  capacidade compatível de instalador.
+- `PATCH`: documentação, texto ou correções de script sem quebra.
+
+Registre mudanças visíveis ao usuário em `CHANGELOG.md`.
+
+## Fluxo Diário
+
+1. Abra o repositório alvo.
+2. Carregue os defaults globais do harness.
+3. Leia `AGENTS.md`, `PROJECT.md` e `ARCHITECTURE.md` do projeto quando
+   existirem.
+4. Escolha role, skill, profile e workflow apenas quando necessário.
+5. Implemente ou analise a tarefa atual.
+6. Valide.
+7. Resuma mudanças, validação e risco residual.
+
+Exemplos:
+
+- `architect + deep + architecture-change`
+- `implementer + normal + feature`
+- `debugger + deep + bugfix`
+- `reviewer + normal + review`
+- `implementer + fast + small fix`
