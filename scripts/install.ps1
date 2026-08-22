@@ -56,6 +56,49 @@ function Set-Link {
     Write-Host "Linked: $LinkPath -> $Target"
 }
 
+function Backup-CodexSkillPath {
+    param([Parameter(Mandatory)] [string]$Path)
+    $backupDir = Join-Path $HOME ".codex/skills-backups"
+    New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
+    $name = Split-Path -Leaf $Path
+    $base = Join-Path $backupDir "$name.bak"
+    $candidate = $base
+    $n = 1
+    while (Test-PathOrLink -Path $candidate) {
+        $candidate = "$base.$n"
+        $n += 1
+    }
+    Rename-Item $Path $candidate
+    return $candidate
+}
+
+function Set-CodexSkillLink {
+    param(
+        [Parameter(Mandatory)] [string]$Target,
+        [Parameter(Mandatory)] [string]$LinkPath
+    )
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $LinkPath) | Out-Null
+    $item = Get-PathItem -Path $LinkPath
+    if ($item) {
+        if ($item.LinkType -and $item.Target -eq $Target) {
+            Write-Host "Already linked: $LinkPath -> $Target"
+            return
+        }
+        if ($item.LinkType) {
+            if ($item.PSIsContainer) {
+                [System.IO.Directory]::Delete($LinkPath, $false)
+            } else {
+                [System.IO.File]::Delete($LinkPath)
+            }
+        } else {
+            $bak = Backup-CodexSkillPath -Path $LinkPath
+            Write-Host "Existing Codex skill moved to backup: $bak"
+        }
+    }
+    New-Item -ItemType Junction -Path $LinkPath -Target $Target | Out-Null
+    Write-Host "Linked: $LinkPath -> $Target"
+}
+
 $AgentsConfig = Join-Path $HOME ".agents-config"
 $item = Get-PathItem -Path $AgentsConfig
 if ($item) {
@@ -86,6 +129,14 @@ if (Test-Path $ClaudeSettings) {
 }
 
 Set-Link -Target (Join-Path $RepoDir "adapters/codex/AGENTS.md") -LinkPath (Join-Path $HOME ".codex/AGENTS.md") -Type SymbolicLink
+$CodexSkills = Join-Path $HOME ".codex/skills"
+New-Item -ItemType Directory -Force -Path $CodexSkills | Out-Null
+Get-ChildItem (Join-Path $RepoDir "skills") -Directory | Sort-Object Name | ForEach-Object {
+    $skillFile = Join-Path $_.FullName "SKILL.md"
+    if (Test-Path $skillFile) {
+        Set-CodexSkillLink -Target $_.FullName -LinkPath (Join-Path $CodexSkills $_.Name)
+    }
+}
 Set-Link -Target (Join-Path $RepoDir "adapters/copilot/instructions") -LinkPath (Join-Path $HOME ".copilot/instructions") -Type Junction
 Set-Link -Target (Join-Path $RepoDir "adapters/copilot/profiles") -LinkPath (Join-Path $HOME ".copilot/profiles") -Type Junction
 Set-Link -Target (Join-Path $RepoDir "adapters/kimi/AGENTS.md") -LinkPath (Join-Path $KimiCodeHome "AGENTS.md") -Type SymbolicLink

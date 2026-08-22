@@ -32,6 +32,10 @@
 - Add generated adapters for Claude, Codex, Copilot, Kimi, and ZCode.
 - Add installer support for shell and PowerShell, including Kimi/ZCode links
   and Claude RTK settings preservation.
+- Add Codex skill installation through per-skill links into `~/.codex/skills`,
+  preserving Codex system skills.
+- Move replaced Codex skill directories to `~/.codex/skills-backups` so backup
+  copies do not remain discoverable as active skills.
 - Add `init-project` support for shell and PowerShell with explicit target,
   dry-run, idempotency, overwrite protection, and project-local context only.
 - Add project bootstrap structure for `docs/decisions/`,
