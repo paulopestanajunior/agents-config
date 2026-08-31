@@ -1,0 +1,29 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate components
+        run: sh scripts/validate-components.sh
+
+      - name: Generated artifacts are up to date
+        run: |
+          sh scripts/generate-adapters.sh
+          if ! git diff --exit-code; then
+            echo "::error::Generated artifacts are stale. Run scripts/generate-adapters.sh and commit the result."
+            exit 1
+          fi
+
+      - name: Shell syntax
+        run: |
+          for f in scripts/*.sh; do
+            sh -n "$f" || exit 1
+          done

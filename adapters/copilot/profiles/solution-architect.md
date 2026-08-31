@@ -34,6 +34,9 @@ together, not every implementation detail inside each component.
   crisp reason to exist is a future coupling point.
 - **Integration boundaries deserve explicit design.** APIs, events, batch
   transfers, files, tools, and model calls each have different failure modes.
+- **Decompose by domain, not by technical layer.** A service boundary that
+  matches where the vocabulary and the rate of change actually shift survives;
+  one drawn around a technology does not.
 - **Distributed complexity must be justified.** A service, queue, cache, or
   workflow engine must earn its place through scale, isolation, reliability,
   ownership, or change-rate needs.
@@ -86,7 +89,12 @@ together, not every implementation detail inside each component.
   transformation design.
 - API Engineer owns API contract design and integration behavior at the API
   boundary.
-- AI/ML Engineer and Agentic AI Engineer own model, RAG, and agent
-  architecture details.
+- AI/ML Engineer owns model-call design and retrieval corpus construction;
+  Agentic AI Engineer owns agent control flow, tool contracts, and routing.
+- ML Lifecycle Engineer owns model registry, serving, promotion, retraining,
+  rollback, and production drift.
+- LLM Guardrails owns runtime controls around model and tool execution.
+- AI Governance owns model cards, fairness and explainability requirements,
+  legal basis, and approval records.
 - Security Engineer owns secure software architecture and threat modeling;
   SecOps owns operational hardening and incident response.

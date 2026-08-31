@@ -67,7 +67,12 @@ scripts, generated adapters, or routing tables.
 - Cloud Architect owns cloud infrastructure architecture and managed-service
   trade-offs.
 - Data Engineer owns data pipeline and data platform design.
-- AI/ML Engineer and Agentic AI Engineer own model, RAG, and agent design.
+- AI/ML Engineer owns model-call design and retrieval corpus; Agentic AI
+  Engineer owns agent control flow and tool contracts.
+- ML Lifecycle Engineer owns model serving, promotion, retraining, rollback,
+  and production drift.
+- LLM Guardrails owns runtime controls around model execution; AI Governance
+  owns model cards, fairness, and regulatory obligations.
 - DevOps owns deployment execution, CI/CD, IaC, and operational automation.
 - Tech Lead owns planning, sequencing, prioritization, coordination,
   delegation, and project risk.

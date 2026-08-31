@@ -76,5 +76,8 @@ architecture should exist.
 - End-to-end solution composition across application, data, AI, integrations,
   cloud, security, and operations -> Solution Architect.
 - Data pipeline logic inside the job being deployed -> Data Engineer.
-- Agent/model architecture being deployed -> AI/ML Engineer.
+- Model artifact, serving path, promotion, and rollback of a trained model ->
+  ML Lifecycle Engineer.
+- Agent control flow being deployed -> Agentic AI Engineer. Model-call design
+  -> AI/ML Engineer.
 - Business metric affected by a deployment incident -> Data Analyst.

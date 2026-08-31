@@ -63,4 +63,7 @@ is DevOps), although the two areas overlap.
   Tracking Integrations QA.
 - Sensitive data modeling in warehouse, masking/anonymization in analytical
   pipeline -> Data Engineer.
-- Prompt injection specifically in agent/LLM context -> AI/ML Engineer.
+- Prompt injection, tool injection, model input/output filtering, and PII
+  redaction before the model -> LLM Guardrails.
+- AI-specific regulatory, fairness, and transparency obligations -> AI
+  Governance.

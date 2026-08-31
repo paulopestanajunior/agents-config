@@ -27,6 +27,16 @@ details live in focused resources.
 - `adapters/`: vendor-specific compatibility layers generated from or pointing
   back to the canonical global harness.
 
+## Component Boundaries
+
+Components delegate to each other with `-> Component Name`. Every delegation
+names the **sub-object**, never the bare domain. "RAG -> X" or "drift -> Y"
+creates an ambiguous edge that another component will claim back; "corpus
+construction" and "production drift monitoring" do not. Run
+`scripts/validate-components.sh` (or `.ps1`) after editing boundaries: it
+resolves every edge, reports unresolved targets, and flags mutual delegation
+for review.
+
 ## Layering
 
 The global harness defines how agents work.
