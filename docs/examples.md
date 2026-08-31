@@ -288,3 +288,115 @@ de deploy e segurança de execução de IaC.
 Saída esperada: riscos de mudança destrutiva, problemas de secret/IAM,
 preocupações de plan/apply, perguntas de rollback/recovery e passos de
 validação antes do deploy.
+
+## Começar Um Projeto Do Zero
+
+```text
+role: tech-lead
+workflow: project-kickoff
+profile: deep
+```
+
+Cenário: uma ideia, um briefing ou um repositório vazio, e você não sabe por
+onde começar.
+
+Por que combina: Tech Lead sequencia decisões e delega aos especialistas;
+`project-kickoff` transforma o briefing em escopo de MVP, não-objetivos e
+decisões bloqueantes, e termina preenchendo `PROJECT.md`, `ARCHITECTURE.md` e
+`WORKING_CONTEXT.md`.
+
+Saída esperada: problema reformulado, escopo de MVP com não-objetivos
+explícitos, decisões bloqueantes com dono, ordem de execução e plano em
+`docs/plans/active/`.
+
+## Entrar Em Um Repositório Desconhecido
+
+```text
+role: researcher
+workflow: codebase-onboarding
+profile: deep
+```
+
+Cenário: `git clone` de um projeto que você nunca trabalhou e precisa entender
+antes de mudar qualquer coisa.
+
+Por que combina: Researcher separa evidência de suposição; o workflow lê
+entrypoints, comandos, boundaries reais e fluxos de dado antes de concluir.
+
+Saída esperada: `PROJECT.md` e `ARCHITECTURE.md` preenchidos a partir do
+código, invariantes e áreas frágeis identificadas, e a lista do que não foi
+possível inferir e precisa de resposta humana.
+
+## Mudança Em Pipeline De Dados
+
+```text
+role: implementer
+skill: data-engineer
+workflow: pipeline-change
+profile: deep
+```
+
+Cenário: alterar ingestão, transformação, tabela ou mart com consumidores já
+existentes.
+
+Por que combina: Data Engineer é dono de pipeline, lineage e layout de
+armazenamento; o workflow força mapear consumidores, idempotência e backfill
+antes da mudança.
+
+Saída esperada: contrato atual declarado, impacto downstream, estratégia de
+backfill, validação de grão e completude, e lineage atualizado.
+
+## Número Divergente Entre Plataforma E Warehouse
+
+```text
+role: data-quality-auditor
+workflow: metric-discrepancy
+profile: deep
+```
+
+Cenário: a métrica do GA4, da plataforma de mídia ou do dashboard não bate com
+o warehouse e alguém precisa decidir em cima disso.
+
+Por que combina: o role tem postura de auditoria e trilha de evidência; o
+workflow compara camada a camada em vez de adivinhar a causa.
+
+Saída esperada: as duas definições confrontadas, a primeira camada onde
+divergem, o quanto do gap está explicado, o dono da correção e se a métrica é
+segura para a decisão agora.
+
+## Promoção De Modelo Com Suspeita De Drift
+
+```text
+skill: ml-lifecycle-engineer
+workflow: model-promotion
+profile: deep
+```
+
+Cenário: existe um modelo candidato, ou o modelo em produção parece ter
+degradado, e é preciso decidir promover, segurar ou reverter.
+
+Por que combina: ML Lifecycle Engineer é dono de registry, promoção, rollback e
+drift em produção; Data Scientist explica a causa, mas não é dono do gate.
+
+Saída esperada: linhagem da versão, gate declarado com threshold, verificação
+de skew treino/serving, resultado da comparação online, decisão registrada e
+gatilho de rollback definido.
+
+## Instrumentação De Tracking Ponta A Ponta
+
+```text
+skill: analytics-instrumentation
+workflow: tracking-implementation
+profile: deep
+```
+
+Cenário: uma necessidade de mensuração que precisa virar evento implementado,
+validado e reconciliado.
+
+Por que combina: o workflow encadeia contrato (Analytics Instrumentation),
+implementação (Web Analytics Engineer) e prova de disparo (QA Tracking
+Integrations) na ordem certa.
+
+Saída esperada: contrato de evento com identidade, consentimento e chave de
+deduplicação; disparo verificado em não-produção; contagem reconciliada; e o
+contrato versionado onde os consumidores acham.

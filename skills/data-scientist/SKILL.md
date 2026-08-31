@@ -79,6 +79,14 @@ Engineer).
 ## When To Delegate To Another Specialist
 
 - Raw data missing, poorly modeled, or expensive to query -> Data Engineer.
-- Put the trained model into production as a service/pipeline -> AI/ML
-  Engineer.
+- Put the trained model into production as a service/pipeline: registry,
+  versioning, serving, retraining, and rollback -> ML Lifecycle Engineer.
+- Production drift monitoring, thresholds, alerting, and the rollback decision
+  -> ML Lifecycle Engineer. You explain the cause once drift is detected.
+- Serving features to a live model with point-in-time correctness -> ML
+  Lifecycle Engineer. The feature table itself -> Data Engineer.
+- Running the online champion/challenger test -> ML Lifecycle Engineer. You own
+  its statistical design: sample size, power, and stopping rule.
+- Model card, fairness documentation, and legal basis for training data -> AI
+  Governance. You own the bias measurement methodology.
 - Translate model results into a dashboard for stakeholders -> Data Analyst.

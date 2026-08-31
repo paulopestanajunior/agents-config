@@ -42,6 +42,10 @@ can execute.
 - **Events are contracts, not labels.** A name without trigger, owner,
   identity, properties, destinations, and validation criteria is not a
   measurement contract.
+- **The event name is the shared vocabulary.** Product, engineering, analytics,
+  and marketing must read a name the same way. When two teams use one term for
+  two behaviors, split the event or scope the name to the domain; do not let
+  one name carry both meanings.
 - **One behavior needs one canonical definition.** Multiple platform-specific
   names can exist, but they must map back to a single behavioral meaning.
 - **Identity is designed, not discovered later.** Anonymous and authenticated

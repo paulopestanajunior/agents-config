@@ -29,6 +29,12 @@ ML model, dashboard, or application).
 
 - **Idempotency before everything.** Reprocessing the same period/batch must
   not create duplicates. Prefer MERGE by key or partition over blind APPEND.
+- **One word, one meaning per domain.** A metric or entity name is the shared
+  vocabulary between pipeline, mart, and consumer; the definition and the name
+  must move together. When "customer", "session", or "conversion" means
+  something different in two marts, that is a context boundary to make explicit
+  — one canonical definition per domain plus a documented translation — not a
+  discrepancy to silently reconcile.
 - **Schema is a contract.** Production schema changes must be deliberate
   (explicit migration), never silent through `ALLOW_FIELD_ADDITION` without
   cleanup of dead columns.
@@ -69,7 +75,14 @@ ML model, dashboard, or application).
 
 ## When To Delegate To Another Specialist
 
-- Statistical model or feature engineering for ML -> Data Scientist.
+- Selecting and deriving predictive features for a model -> Data Scientist. The
+  feature table, its grain, freshness, contract, and backfill remain yours.
+- Serving those features to a live model with point-in-time correctness and
+  training-serving skew -> ML Lifecycle Engineer.
+- Model artifact storage and versioning is not a data table -> ML Lifecycle
+  Engineer.
+- Consent and legal basis for using a dataset to train a model -> AI
+  Governance. PII classification and lineage in the platform remain yours.
 - Query-level SQL correctness or optimization -> SQL Expert.
 - Operational database schema, indexes, transactions, and migrations ->
   Database Engineer.

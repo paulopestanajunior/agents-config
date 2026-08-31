@@ -40,5 +40,11 @@ security.
 
 - SecOps owns operational security, incident response, and hardening.
 - Security Engineer focuses on software security and architecture.
+- LLM Guardrails owns model-specific trust boundaries: prompt and tool
+  injection, output validation, PII redaction before the model, and action
+  allowlists. Security Engineer owns the surrounding threat model and
+  authorization.
+- AI Governance owns AI-specific harm, fairness, transparency, and
+  legal-basis risk.
 - API Engineer owns API contract reliability; Security Engineer reviews API
   threat and authorization boundaries.

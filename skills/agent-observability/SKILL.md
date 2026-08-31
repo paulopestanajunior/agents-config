@@ -16,6 +16,9 @@ improve reliability.
 
 - Design traces for model calls, tool calls, routing decisions, handoffs,
   memory reads/writes, retries, errors, and validation steps.
+- Require model version and prompt version as trace fields. Without them a
+  behavior change cannot be attributed to a deployment, and champion/challenger
+  comparison is impossible downstream.
 - Define metrics for latency, time to first token, total task duration,
   context size, token usage, cost, retries, cache hit rate, tool failure rate,
   and task success.
@@ -55,3 +58,8 @@ improve reliability.
 - Agent Observability owns agent-specific trajectories and behavior signals.
 - Agentic AI Engineer owns runtime architecture and tool orchestration design.
 - Agent Evaluation uses observability signals to score end-to-end behavior.
+- ML Lifecycle Engineer owns model-quality signals over time: drift, decay,
+  prediction distribution, and version comparison in production. Agent
+  Observability owns per-run trajectory signals.
+- LLM Guardrails owns block, allow, and redaction decisions. Agent
+  Observability owns making them traceable.

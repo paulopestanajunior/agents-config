@@ -55,9 +55,27 @@ function Ensure-FileFromTemplate {
 Ensure-FileFromTemplate -RelativePath "AGENTS.md" -TemplateName "AGENTS.md"
 Ensure-FileFromTemplate -RelativePath "PROJECT.md" -TemplateName "PROJECT.md"
 Ensure-FileFromTemplate -RelativePath "ARCHITECTURE.md" -TemplateName "ARCHITECTURE.md"
+Ensure-FileFromTemplate -RelativePath "WORKING_CONTEXT.md" -TemplateName "WORKING_CONTEXT.md"
 Ensure-Dir -RelativePath "docs/decisions"
 Ensure-Dir -RelativePath "docs/plans/active"
 Ensure-Dir -RelativePath "docs/plans/completed"
 Ensure-Dir -RelativePath "docs/specs/active"
 Ensure-Dir -RelativePath "docs/specs/completed"
 Ensure-Dir -RelativePath ".agents/overrides"
+
+Write-Host @'
+
+Next step: the files above are templates. Fill them with one of:
+
+  workflow: project-kickoff       new project from an idea or briefing
+  workflow: codebase-onboarding   existing repository you have not worked in
+
+Example prompt:
+
+  Use:
+  role: tech-lead
+  workflow: project-kickoff
+  profile: deep
+
+  <your briefing here>
+'@

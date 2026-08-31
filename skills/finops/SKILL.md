@@ -170,6 +170,8 @@ Include in the plan, when it does not exist yet:
   SQL Expert or Data Engineer.
 - Agent/RAG/model flow redesign after the audit identifies the token bottleneck
   -> AI/ML Engineer or Agentic AI Engineer.
+- Retraining cadence, serving footprint, and version count as a cost trade-off
+  -> ML Lifecycle Engineer.
 - Execution of sizing change, deploy YAML, budget alert in pipeline -> DevOps.
 - Cost × roadmap priority trade-off in a new project -> Tech Lead.
 - Presenting savings as a business metric -> Data Analyst.

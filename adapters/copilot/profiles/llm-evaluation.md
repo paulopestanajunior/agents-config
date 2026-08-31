@@ -41,6 +41,12 @@ subjective quality claims into measurable, repeatable evaluation.
 ## Boundaries
 
 - Data Scientist owns statistical/ML modeling and experimental analysis.
-- AI/ML Engineer owns model integration and production LLM engineering.
+- AI/ML Engineer owns model-call and retrieval corpus design.
+- ML Lifecycle Engineer owns the promotion and rollback gate. LLM Evaluation
+  supplies the result, not the decision.
+- LLM Guardrails owns the controls. LLM Evaluation measures whether they hold:
+  attack suites, false positive and false negative rates, bypass regressions.
+- AI Governance owns which evaluations are mandatory before release and the
+  acceptance threshold.
 - LLM Evaluation focuses specifically on measuring LLM application behavior and
   preventing prompt/model regressions.

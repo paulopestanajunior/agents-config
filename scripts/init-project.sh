@@ -63,9 +63,27 @@ ensure_file_from_template() {
 ensure_file_from_template "AGENTS.md" "AGENTS.md"
 ensure_file_from_template "PROJECT.md" "PROJECT.md"
 ensure_file_from_template "ARCHITECTURE.md" "ARCHITECTURE.md"
+ensure_file_from_template "WORKING_CONTEXT.md" "WORKING_CONTEXT.md"
 ensure_dir "docs/decisions"
 ensure_dir "docs/plans/active"
 ensure_dir "docs/plans/completed"
 ensure_dir "docs/specs/active"
 ensure_dir "docs/specs/completed"
 ensure_dir ".agents/overrides"
+
+cat <<'EOF'
+
+Next step: the files above are templates. Fill them with one of:
+
+  workflow: project-kickoff       new project from an idea or briefing
+  workflow: codebase-onboarding   existing repository you have not worked in
+
+Example prompt:
+
+  Use:
+  role: tech-lead
+  workflow: project-kickoff
+  profile: deep
+
+  <your briefing here>
+EOF

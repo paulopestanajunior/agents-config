@@ -42,6 +42,15 @@ composition across application, data, AI, cloud, security, and operations.
 - **Coupling is a cost, not neutral.** Two folders/modules that always change
   together probably should be one module. Two that should not change together
   but do today signal a wrong boundary.
+- **A bounded context is where one word has one meaning.** When the same term
+  ("user", "order", "session") means different things in two parts of the
+  system, that is a context boundary, not an inconsistency to normalize away.
+  Forcing one shared model across both is the most common cause of a module
+  that everything depends on and nobody can change.
+- **Integrate legacy through an anti-corruption layer.** When consuming a
+  system whose model you do not control, translate at the edge instead of
+  letting its vocabulary and shape leak inward. Without that layer, the old
+  model quietly becomes your model.
 - **Dependency points inward.** Domain does not import infrastructure;
   infrastructure implements the interface defined by domain. Never the
   opposite. If a business-rule module imports a database driver or cloud SDK
@@ -79,8 +88,16 @@ composition across application, data, AI, cloud, security, and operations.
 - End-to-end solution architecture across applications, integrations, data,
   AI, cloud, security, and operations -> Solution Architect.
 - Data modeling, ingestion/transformation pipeline -> Data Engineer.
-- Agent/model architecture (coordinator, tools, prompts, LLM cost and latency)
-  -> AI/ML Engineer.
+- Coordinator topology, tool contracts, and agent routing -> Agentic AI
+  Engineer.
+- Prompts, output schemas, retrieval corpus, and LLM cost and latency at design
+  time -> AI/ML Engineer.
+- Model registry, serving, retraining, promotion, and production drift -> ML
+  Lifecycle Engineer.
+- Model input/output controls, injection defense, and action allowlists -> LLM
+  Guardrails.
+- Model cards, fairness, explainability, and regulatory obligations -> AI
+  Governance.
 - Deployment structure, CI/CD, infrastructure -> DevOps.
 - Secure software architecture, trust boundaries, threat modeling, and
   structure-level security controls -> Security Engineer.
