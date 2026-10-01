@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `skills/academic-peer-reviewer`: manuscript assessment against the
+  evidence it presents, methodology and reproducibility review, structural
+  citation practice, and a structured accept/revise/reject verdict.
+- `skills/academic-writing-coach`: scoping, structuring, drafting, and
+  revising a thesis, dissertation, TCC, or research monograph, with ABNT as
+  the default Brazilian convention and an explicit boundary against
+  ghostwriting the author's original contribution.
+- `skills/source-verification`: citation and source accuracy, separating
+  existence from accuracy and from source-type authority, with a
+  Supported/Overstated/Misattributed/Contradicted/Not-Located/Wrong-Source-Type
+  verdict taxonomy.
+
 ## 1.1.0 - 2026-08-31
 
 ### Added

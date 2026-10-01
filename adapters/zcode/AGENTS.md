@@ -56,6 +56,8 @@ and exceptions belong in the project's own `AGENTS.md`, `PROJECT.md`,
 
 ## Skills
 
+- `academic-peer-reviewer` - Academic Peer Reviewer — Manuscript Assessment (`skills/academic-peer-reviewer/SKILL.md`)
+- `academic-writing-coach` - Academic Writing Coach — Thesis / TCC / Monograph Creation (`skills/academic-writing-coach/SKILL.md`)
 - `agent-evaluation` - Agent Evaluation (`skills/agent-evaluation/SKILL.md`)
 - `agent-observability` - Agent Observability (`skills/agent-observability/SKILL.md`)
 - `agentic-ai-engineer` - Agentic AI Engineer (`skills/agentic-ai-engineer/SKILL.md`)
@@ -83,6 +85,7 @@ and exceptions belong in the project's own `AGENTS.md`, `PROJECT.md`,
 - `skill-evaluation` - Skill Evaluation (`skills/skill-evaluation/SKILL.md`)
 - `software-architect` - Software Architect — Project Structure / Code Organization (`skills/software-architect/SKILL.md`)
 - `solution-architect` - Solution Architect (`skills/solution-architect/SKILL.md`)
+- `source-verification` - Source Verification — Citation And Source Accuracy (`skills/source-verification/SKILL.md`)
 - `sql-expert` - SQL Expert (`skills/sql-expert/SKILL.md`)
 - `sre-observability` - SRE Observability (`skills/sre-observability/SKILL.md`)
 - `technical-documentation` - Technical Documentation (`skills/technical-documentation/SKILL.md`)
